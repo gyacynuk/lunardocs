@@ -5,7 +5,7 @@ import styled, { ThemeProvider } from 'styled-components';
 import { getTheme } from './redux/selectors';
 import { toggleDisplayMode } from './redux/actions'
 import { lightTheme, darkTheme } from './theme';
-import Button from './components/EditorControlBar';
+import GlobalStyle from './theme/globalStyle'
 import './App.css';
 
 const AppContainer = styled.div`
@@ -34,6 +34,7 @@ const App = () => {
     
     return (
         <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+            <GlobalStyle/>
             <AppContainer>
                 <Text>{"Hello World " + theme}</Text>
                 <SmallText>I am so tiny</SmallText>
