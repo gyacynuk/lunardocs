@@ -1,0 +1,3 @@
+export const TOGGLE_DISPLAY_MODE = "TOGGLE_DISPLAY_MODE";
+export const TOGGLE_TODO = "TOGGLE_TODO";
+export const SET_FILTER = "SET_FILTER";
