@@ -1,12 +1,11 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import styled, { ThemeProvider } from 'styled-components';
 
-import { getTheme } from './redux/selectors';
-import { toggleDisplayMode } from './redux/actions'
+import { getTheme } from './store/selectors';
 import { lightTheme, darkTheme } from './theme';
 import GlobalStyle from './theme/globalStyle'
-import './App.css';
+import NavBar from './components/Navbar'
 
 const AppContainer = styled.div`
     position: fixed;
@@ -19,31 +18,14 @@ const AppContainer = styled.div`
     background-color: ${({ theme }) => theme.palette.background};
 `;
 
-const Text = styled.p`
-    color: ${({ theme }) => theme.palette.text.heavy};
-`
-
-const SmallText = styled.p`
-    font-size: 10px;
-    color: ${({ theme }) => theme.palette.text.light};
-`
-
 const App = () => {
-    const dispatch = useDispatch();
     const theme = useSelector(getTheme);
     
     return (
         <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
             <GlobalStyle/>
             <AppContainer>
-                <Text>{"Hello World " + theme}</Text>
-                <SmallText>I am so tiny</SmallText>
-                <a
-                className="App-link"
-                onClick={() => dispatch(toggleDisplayMode())}
-                >
-                Toggle Theme
-                </a>
+                <NavBar/>
             </AppContainer>
         </ThemeProvider>
     )

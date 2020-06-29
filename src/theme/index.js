@@ -1,3 +1,4 @@
+import constants from './constants'
 import typography from './typography'
 import { darkPalette, lightPalette } from './palette'
 import { breakpoints, isMobile, isTablet, isDesktop } from './breakpoint'
@@ -7,6 +8,7 @@ const baseTheme = {
     isTablet,
     isDesktop,
     breakpoints,
+    constants,
     typography
 }
 

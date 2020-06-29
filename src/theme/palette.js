@@ -1,5 +1,5 @@
 export const lightPalette = {
-    background: '#f8f8f8',
+    background: '#f6f6f6',
     text: {
         heavy: '#222',
         regular: '#666',
