@@ -53,7 +53,7 @@ const NavBar = () => {
     return (
         <NavBarRow>
             <div>
-                <DocumentsIcon />
+                <DocumentsIcon/>
                 <LightBulbIcon/>
             </div>
             <div>

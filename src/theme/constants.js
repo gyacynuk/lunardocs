@@ -11,25 +11,30 @@ export default {
             y: `${navBarPaddingY}px`,
         },
     },
-    icon: {
+    icons: {
         baseStyle: `
             width: 24px;
             height: 24px;
             margin: 0 16px;
 
             cursor: pointer;
+        `,
+        strokeStyleWith: theme => `
+            stroke: ${theme.palette.text.heavy};
+            stroke-width: 1.5;
 
             transition: stroke 200ms ease;
             &:hover {
                 stroke: #7C89FF;
             }
         `,
-        strokeStyleWith: theme => `
-            stroke: ${({ theme }) => theme.palette.text.heavy};
-            stroke-width: 1.5;
-        `,
         fillStyleWith: theme => `
-            fill: ${({ theme }) => theme.palette.text.heavy};
+            fill: ${theme.palette.text.heavy};
+
+            transition: fill 200ms ease;
+            &:hover {
+                fill: #7C89FF;
+            }
         `
     }
 }
