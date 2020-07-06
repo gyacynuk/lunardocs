@@ -2,9 +2,10 @@ const navBarHeight = 80;
 const navBarPaddingX = 32;
 const navBarPaddingY = 24;
 
+const dotSize = 12;
+
 export default {
     navBar: {
-        totalHeight: `${navBarHeight + 2*navBarPaddingY}px`,
         height: `${navBarHeight}px`,
         padding: {
             x: `${navBarPaddingX}px`,
@@ -36,5 +37,8 @@ export default {
                 fill: #7C89FF;
             }
         `
+    },
+    browser: {
+        dotSize: `${dotSize}px`
     }
 }

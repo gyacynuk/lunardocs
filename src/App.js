@@ -6,6 +6,7 @@ import { getTheme } from './store/selectors';
 import { lightTheme, darkTheme } from './theme';
 import GlobalStyle from './theme/globalStyle'
 import NavBar from './components/Navbar'
+import DocumentBrowser from './containers/DocumentBrowser';
 
 const AppContainer = styled.div`
     position: fixed;
@@ -26,6 +27,7 @@ const App = () => {
             <GlobalStyle/>
             <AppContainer>
                 <NavBar/>
+                <DocumentBrowser/>
             </AppContainer>
         </ThemeProvider>
     )

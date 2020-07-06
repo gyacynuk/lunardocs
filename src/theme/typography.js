@@ -1,5 +1,5 @@
 const fontWeightRegular = 400;
-const fontFamily = '"Roboto", "Helvetica", "Arial", sans-serif';
+const fontFamily = '"Barlow", "Helvetica", "Arial", sans-serif';
 const editorFontFamily = '"Source Code Pro", monospace';
 
 export default {
@@ -36,13 +36,13 @@ export default {
   h5: {
     fontFamily: fontFamily,
     fontWeight: fontWeightRegular,
-    fontSize: '1.375rem',
+    fontSize: '1.25rem',
     lineHeight: 1.41,
   },
   h6: {
     fontFamily: fontFamily,
     fontWeight: fontWeightRegular,
-    fontSize: '1.25rem',
+    fontSize: '1rem',
     lineHeight: 1.4,
   },
   bodyLarge: {
@@ -61,6 +61,12 @@ export default {
     fontFamily: fontFamily,
     fontWeight: fontWeightRegular,
     fontSize: '0.875rem',
+    lineHeight: 1.5,
+  },
+  searchBar:{
+    fontFamily: fontFamily,
+    fontWeight: fontWeightRegular,
+    fontSize: '1rem',
     lineHeight: 1.5,
   },
   button: {
