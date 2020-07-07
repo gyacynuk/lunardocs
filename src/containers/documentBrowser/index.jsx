@@ -6,6 +6,7 @@ import Divider from './Divider';
 import Document from './Document';
 import SearchBar from './SearchBar';
 import Spacer from '../../components/Spacer';
+import NewDocumentButton from './NewDocumentButton';
 
 const OuterContainer = styled.div`
     position: fixed;
@@ -41,6 +42,8 @@ const DocumentBrowser = () => {
                 <SearchBar/>
                 <Spacer height={32}/>
                 <ScrollableContainer>
+                    <NewDocumentButton/>
+                    <Divider/>
                     <Document title="Astrial Designer Drugs" date="July 5th, 2020" subjectColor="red"/>
                     <Divider/>
                     <Document title="Salvia Letterpress" date="July 4th, 2020" subjectColor="violet"/>

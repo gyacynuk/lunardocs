@@ -2,7 +2,7 @@ const navBarHeight = 80;
 const navBarPaddingX = 32;
 const navBarPaddingY = 24;
 
-const dotSize = 12;
+const dotSize = 14;
 
 export default {
     navBar: {
@@ -36,9 +36,9 @@ export default {
             &:hover {
                 fill: #7C89FF;
             }
-        `
+        `,
     },
     browser: {
-        dotSize: `${dotSize}px`
+        dotSize: `${dotSize}px`,
     }
 }

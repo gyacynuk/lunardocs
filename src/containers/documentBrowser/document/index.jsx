@@ -8,7 +8,6 @@ import RowItem from '../RowItem'
 const Dot = styled.div`
     width: ${({ theme }) => theme.constants.browser.dotSize};
     height: ${({ theme }) => theme.constants.browser.dotSize};
-
     margin: 0 21px; /* centers with search magnify icon */
 
     border-radius: 50%;

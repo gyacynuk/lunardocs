@@ -17,7 +17,7 @@ export const RowContainer = styled.div`
 
 const RowItem = (props) => {
     return (
-        <RowContainer>
+        <RowContainer {...props}>
             {props.children}
         </RowContainer>
     );
