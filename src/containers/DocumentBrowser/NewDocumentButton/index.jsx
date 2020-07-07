@@ -49,45 +49,23 @@ const TitleInput = styled.input`
     }
 `
 
+function useFocus() {
+    const focusRef = useRef(null);
+    const setFocus = () => focusRef.current && focusRef.current.focus();
 
-function focusOnTitleInput(titleInputRef) {
-    if (titleInputRef.current) {
-        titleInputRef.current.focus();
-    }
-}
-
-function useOutsideAlerter(ref) {
-    useEffect(() => {
-        /**
-         * Alert if clicked on outside of element
-         */
-        function handleClickOutside(event) {
-            if (ref.current && !ref.current.contains(event.target)) {
-                alert("You clicked outside of me!");
-            }
-        }
-
-        // Bind the event listener
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            // Unbind the event listener on clean up
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [ref]);
+    return [focusRef, setFocus];
 }
 
 const NewDocumentButton = () => {
-    const titleInputRef = useRef(null);
-    const rowItemRef = useRef(null);
-    useOutsideAlerter(rowItemRef);
+    const [focusRef, setFocus] = useFocus();
 
     return (
-        <RowItem onClick={() => focusOnTitleInput(titleInputRef)}>
+        <RowItem onClick={setFocus}>
             <Dot> 
                 <PlusIcon/>
             </Dot>
             <ContentContainer>
-                <TitleInput ref={titleInputRef} type="text" placeholder="New Document"/>
+                <TitleInput ref={focusRef} type="text" placeholder="New Document"/>
             </ContentContainer>
         </RowItem>
     );
