@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import Divider from './Divider';
 import Document from './Document';
+import DocumentFilter from './DocumentFilter';
 import SearchBar from './SearchBar';
 import Spacer from '../../components/Spacer';
 import NewDocumentButton from './NewDocumentButton';
@@ -40,7 +41,7 @@ const DocumentBrowser = () => {
         <OuterContainer>
             <InnerContainer>
                 <SearchBar/>
-                <Spacer height={32}/>
+                <DocumentFilter/>
                 <ScrollableContainer>
                     <NewDocumentButton/>
                     <Divider/>
