@@ -14,7 +14,14 @@ const ScrollableContainer = styled.div`
     overflow-y: auto;
 `
 
-const Editor = () => {
+const LeafText = styled.span`
+    color: ${({ theme }) => theme.palette.text.heavy};
+    fontFamily: ${({ theme }) => theme.typography.editor.fontFamily};
+    fontWeight: ${props => props.bold ? 'bold' : 'normal'};
+    fontStyle: ${props => props.italic ? 'italic' : 'normal'};
+`
+
+const Editor = (props) => {
     // Create a Slate editor object that won't change across renders.
     const editor = useMemo(() => withReact(createEditor()), [])
 
@@ -28,18 +35,17 @@ const Editor = () => {
 
     const renderLeaf = useCallback(({ attributes, children, leaf }) => {
         return (
-            <span
+            <LeafText
                 {...attributes}
-                style={{
-                    fontFamily: '"Barlow", "Helvetica", "Arial", sans-serif',
-                    fontWeight: leaf.bold ? 'bold' : 'normal',
-                    fontStyle: leaf.italic ? 'italic' : 'normal',
-                }}
+                bold={leaf.bold}
+                italic={leaf.italic}
             >
                 {children}
-            </span>
+            </LeafText>
         )
     }, [])
+
+    console.log(props)
 
     return (
         <ContentPane>
