@@ -6,7 +6,9 @@ import styled from 'styled-components';
 import { ReactComponent as PlusSVG } from '../../../assets/icons/plus.svg';
 
 const Dot = styled.div`
-    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     width: ${({ theme }) => theme.constants.browser.dotSize};
     height: ${({ theme }) => theme.constants.browser.dotSize};
@@ -17,10 +19,6 @@ const Dot = styled.div`
 `
 
 const PlusIcon = styled(PlusSVG)`
-    position: absolute;
-    top: 1px;
-    left: 1px;
-
     width: 8px;
     height: 8px;
 
