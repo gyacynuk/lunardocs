@@ -1,10 +1,12 @@
 const fontWeightRegular = 400;
 const fontFamily = '"Barlow", "Helvetica", "Arial", sans-serif';
-const editorFontFamily = '"Source Code Pro", monospace';
+const editorFontFamily = '"Barlow", "Helvetica", "Arial", sans-serif';
+const codeFontFamily = '"Source Code Pro", monospace';
 
 export default {
   htmlFontSize: 16,
   fontFamily,
+  codeFontFamily,
   fontWeightLight: 300,
   fontWeightRegular,
   fontWeightMedium: 500,

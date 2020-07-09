@@ -1,7 +1,16 @@
 import { VISIBILITY_FILTERS } from "./constants";
 
+// Themeing and display
 export const getTheme = store => store.display.theme;
 
+// Editor
+export const getActiveDocumentValue = store => store.editor.activeDocument.value;
+
+export const getShortcutTarget = store => store.editor.shortcut.target;
+export const getShortcutSearch = store => store.editor.shortcut.search;
+export const getShortcutDropdownIndex = store => store.editor.shortcut.dropdownIndex;
+
+// Examples
 export const getTodosState = store => store.todos;
 
 export const getTodoList = store =>

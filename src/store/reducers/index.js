@@ -1,5 +1,6 @@
-import { combineReducers } from "redux";
-import visibilityFilter from "./visibilityFilter";
-import display from "./display";
+import { combineReducers } from 'redux';
 
-export default combineReducers({ display, visibilityFilter });
+import display from './display';
+import editor from './editor';
+
+export default combineReducers({ display, editor });

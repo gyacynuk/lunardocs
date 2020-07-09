@@ -4,6 +4,7 @@ import RowItem from '../RowItem';
 import styled from 'styled-components';
 
 import { ReactComponent as PlusSVG } from '../../../assets/icons/plus.svg';
+import { useFocus } from '../../../utils'
 
 const Dot = styled.div`
     display: flex;
@@ -48,13 +49,6 @@ const TitleInput = styled.input`
         outline: none;
     }
 `
-
-function useFocus() {
-    const focusRef = useRef(null);
-    const setFocus = () => focusRef.current && focusRef.current.focus();
-
-    return [focusRef, setFocus];
-}
 
 const NewDocumentButton = () => {
     const [focusRef, setFocus] = useFocus();
