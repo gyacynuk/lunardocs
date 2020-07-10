@@ -12,7 +12,7 @@ const Container = styled.div`
 
     border-radius: 4px;
     background-color: ${({ theme }) => theme.palette.background};
-    box-shadow: 0 1px 5px rgba(0,0,0,.2);
+    box-shadow: 0 1px 5px ${({ theme }) => theme.palette.shadow};
 `
 
 const ShortcutPortal = React.forwardRef((props, ref) => {
