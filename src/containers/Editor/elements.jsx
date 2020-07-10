@@ -1,19 +1,23 @@
 import React from "react";
 import styled from 'styled-components';
 
-const LeafStyle = styled.span`
+const DefaultLeafStyle = styled.span``
+const CodeCodeStyle = styled.span`
     border-radius: 4px;
-    background-color: ${props => props.leaf.isCode ? props.theme.palette.text.lighter : `transparent`};
-    padding: ${props => props.leaf.isCode ? `0 4px` : `0`};
-    font-family: ${props => props.leaf.isCode ? props.theme.typography.codeFontFamily : props.theme.typography.editor.fontFamily};
+    background-color: ${({ theme }) => theme.palette.text.lighter};
+    font-family: ${({ theme }) => theme.typography.codeFontFamily};
+    padding: 0 4px;
 `
 export const Leaf = props => {
-    console.log('lef')
-    console.log(props)
+    var LeafComponent = DefaultLeafStyle;
+    if (props.leaf.isCode) {
+        LeafComponent = CodeCodeStyle;
+    }
+
     return (
-      <LeafStyle {...props} {...props.attributes}>
+      <LeafComponent {...props} {...props.attributes}>
         {props.children}
-      </LeafStyle>
+      </LeafComponent>
     )
   }
 
@@ -35,8 +39,12 @@ export const DefaultElement = props => {
     )
 }
 
-const CodeElementStyle = styled.span`
-    color: ${({ theme }) => theme.palette.text.light};
+const CodeElementStyle = styled.div`
+    border-radius: 4px;
+    background-color:  ${({ theme }) => theme.palette.text.lighter};
+    color: ${({ theme }) => theme.palette.text.heavy};
+    padding: 4px;
+
     font-family: ${({ theme }) => theme.typography.codeFontFamily};
     font-weight: ${({ theme }) => theme.typography.editor.fontWeight};
     font-size: ${({ theme }) => theme.typography.editor.fontSize};
@@ -49,4 +57,5 @@ export const CodeElement = props => {
         </CodeElementStyle>
     )
 }
+
   

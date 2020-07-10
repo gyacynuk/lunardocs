@@ -4,7 +4,7 @@ export const lightPalette = {
         heavy: '#222',
         regular: '#666',
         light: '#bcbcbc',
-        lighter: '#ececec',
+        lighter: '#ebebeb',
     }
 };
 
@@ -14,6 +14,6 @@ export const darkPalette = {
         heavy: '#bcbcbc',
         regular: '#767676',
         light: '#666',
-        lighter: '#2d323b',
+        lighter: '#31363f',
     }
 };

@@ -8,10 +8,12 @@ import { Slate, Editable, withReact, ReactEditor, useSelected, useFocused } from
 import { withHistory } from 'slate-history'
 
 import ContentPane from "../../components/ContentPane";
+import ShortcutPortal from './ShortcutPortal'
 import { CodeElement, DefaultElement, Leaf } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
 import { setActiveDocumentValue, setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex } from "../../store/actions";
+import ShortcutItem from "./ShortcutPortal/shortcutItem";
 
 const ScrollableContainer = styled.div`
     width: 100%;
@@ -24,23 +26,6 @@ const StyledEditable= styled(Editable)`
     height: 100%;
     overflow-y: auto;
 `
-
-
-
-
-
-
-// note to self: implement code block as it's own node
-// implememnt inline code as a mark, see: https://github.com/ianstormtaylor/slate/blob/master/site/examples/markdown-preview.js
-//                                   and: https://docs.slatejs.org/walkthroughs/04-applying-custom-formatting
-
-
-
-
-
-
-
-
 
 const withShortcuts = editor => {
     const { isInline, isVoid } = editor
@@ -61,27 +46,41 @@ const Portal = ({ children }) => {
 }
 
 const insertShortcut = (editor, shortcut) => {
-    // const shortcutNode = { type: shortcut, children: [{ text: '' }] }
-    // Transforms.insertNodes(editor, shortcutNode)
-    // Transforms.move(editor)
+    switch (shortcut) {
+        case 'code':
+            // Set the text of the selection to be code
+            Transforms.setNodes(
+                editor,
+                { isCode: true },
+                { match: n => Text.isText(n), split: true }
+            );
+        
+            // Inserts a space, deleting the shortcut typed while preserving the code styling
+            Editor.insertText(editor, ' ')
+        
+            // Select the inserted space, to facilitate easy typing
+            const { selection } = editor
+            if (selection && Range.isCollapsed(selection)) {
+                const [start] = Range.edges(selection)
+                const charBefore = Editor.before(editor, start, { unit: 'character' })
+                const before = charBefore && Editor.before(editor, charBefore)
+                const beforeRange = before && Editor.range(editor, before, start)
+                Transforms.select(editor, beforeRange)
+            }
 
-    Transforms.setNodes(
-        editor,
-        { isCode: true },
-        // Apply it to text nodes, and split the text node up if the
-        // selection is overlapping only part of it.
-        { match: n => Text.isText(n), split: true }
-    );
-
-    Editor.insertText(editor, ' ')
-
-    const { selection } = editor
-    if (selection && Range.isCollapsed(selection)) {
-        const [start] = Range.edges(selection)
-        const charBefore = Editor.before(editor, start, { unit: 'character' })
-        const before = charBefore && Editor.before(editor, charBefore)
-        const beforeRange = before && Editor.range(editor, before, start)
-        Transforms.select(editor, beforeRange)
+            break
+        case 'codeblock':
+            const codeblock = { type: 'codeblock', children: [{ text: '' }] }
+            Transforms.insertNodes(editor, codeblock)
+            Transforms.wrapNodes(
+                editor,
+                { type: 'codeblock', children: [] },
+                {
+                  match: node => Editor.isBlock(editor, node),
+                  mode: 'lowest',
+                }
+            )
+            break
     }
 }
 
@@ -115,6 +114,7 @@ const TextEditor = (props) => {
         shortcut.startsWith(shortcutSearch.toLowerCase())
     ).slice(0, MAX_SHORTCUT_DROPDOWN_SIZE);
 
+    console.log('target is nonnull: ' + !!shortcutTarget)
     console.log(documentValue)
 
     const onKeyDown = useCallback(
@@ -141,12 +141,42 @@ const TextEditor = (props) => {
                     Transforms.select(editor, shortcutTarget)
                     insertShortcut(editor, matchingShortcuts[shortcutDropdownIndex])
                     dispatch(setShortcutTarget(null))
+                    console.log('of fucl')
                     break
                 case 'Escape':
                     event.preventDefault()
                     dispatch(setShortcutTarget(null))
                     break
                 }
+            }
+            switch (event.key) {
+            case 'ArrowRight':
+                const { selection } = editor
+
+                if (selection && Range.isCollapsed(selection)) {
+                    const [start] = Range.edges(selection)
+                    const after = Editor.after(editor, start, { unit: 'character' })
+                    const afterRange = Editor.range(editor, start, after)
+                    const afterText = Editor.string(editor, afterRange)
+                    const afterMatch = afterText.match(/^$/)
+
+                    const [match] = Editor.nodes(editor, {
+                        match: n => n['isCode']
+                    })
+
+                    if (afterMatch && !!match) {
+                        event.preventDefault()
+                        Editor.insertText(editor, ' ')
+                        const newAfter = Editor.after(editor, start, { unit: 'character' })
+                        const newAfterRange = Editor.range(editor, start, newAfter)
+                        Transforms.setNodes(
+                            editor,
+                            { isCode: false },
+                            { at: newAfterRange, match: n => Text.isText(n), split: true }
+                        );
+                    }
+                }
+                break
             }
         },
         [shortcutTarget, shortcutSearch, shortcutDropdownIndex]
@@ -178,7 +208,8 @@ const TextEditor = (props) => {
           const afterText = Editor.string(editor, afterRange)
           const afterMatch = afterText.match(/^(\s|$)/)
 
-          if (beforeMatch && afterMatch) {
+          // And in paragraph node
+          if (beforeMatch && afterMatch && SHORTCUTS.filter(shortcut => shortcut.startsWith(beforeMatch[1].toLowerCase())).length != 0) {
             dispatch(setShortcutTarget(beforeRange))
             dispatch(setShortcutSearch(beforeMatch[1]))
             dispatch(setShortcutDropdownIndex(0))
@@ -191,7 +222,7 @@ const TextEditor = (props) => {
 
     const renderElement = useCallback(props => {
         switch (props.element.type) {
-            case 'code':
+            case 'codeblock':
                 return <CodeElement {...props} />
             case 'paragraph':
             default:
@@ -217,30 +248,15 @@ const TextEditor = (props) => {
                 renderLeaf={renderLeaf}/>
                 {shortcutTarget && matchingShortcuts.length > 0 && (
                     <Portal>
-                    <div
-                    ref={ref}
-                    style={{
-                    top: '-9999px',
-                    left: '-9999px',
-                    position: 'absolute',
-                    zIndex: 1,
-                    padding: '3px',
-                    background: 'white',
-                    borderRadius: '4px',
-                    boxShadow: '0 1px 5px rgba(0,0,0,.2)',
-                    }}>
+                    <ShortcutPortal ref={ref}>
                         {matchingShortcuts.map((shortcut, i) => (
-                        <div
+                        <ShortcutItem
                         key={shortcut}
-                        style={{
-                        padding: '1px 3px',
-                        borderRadius: '3px',
-                        background: i === shortcutDropdownIndex ? '#B4D5FF' : 'transparent',
-                        }}>
+                        isSelected={i === shortcutDropdownIndex}>
                             {shortcut}
-                        </div>
+                        </ShortcutItem>
                         ))}
-                    </div>
+                    </ShortcutPortal>
                     </Portal>
                 )}
             </Slate>
