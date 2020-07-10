@@ -15,16 +15,15 @@ import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortc
 import { setActiveDocumentValue, setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex } from "../../store/actions";
 import ShortcutItem from "./ShortcutPortal/shortcutItem";
 
-const ScrollableContainer = styled.div`
-    width: 100%;
-    height: 100%;
-
-    overflow-y: auto;
-`
-
 const StyledEditable= styled(Editable)`
     height: 100%;
     overflow-y: auto;
+
+    color: ${({ theme }) => theme.palette.text.heavy};
+    font-family: ${({ theme }) => theme.typography.editor.fontFamily};
+    font-weight: ${({ theme }) => theme.typography.editor.fontWeight};
+    font-size: ${({ theme }) => theme.typography.editor.fontSize};
+    line-height: ${({ theme }) => theme.typography.editor.lineHeight};
 `
 
 const withShortcuts = editor => {
@@ -70,7 +69,7 @@ const insertShortcut = (editor, shortcut) => {
 
             break
         case 'codeblock':
-            const codeblock = { type: 'codeblock', children: [{ text: '' }] }
+            const codeblock = { type: 'paragraph', children: [{ text: '' }] }
             Transforms.insertNodes(editor, codeblock)
             Transforms.wrapNodes(
                 editor,
@@ -114,7 +113,6 @@ const TextEditor = (props) => {
         shortcut.startsWith(shortcutSearch.toLowerCase())
     ).slice(0, MAX_SHORTCUT_DROPDOWN_SIZE);
 
-    console.log('target is nonnull: ' + !!shortcutTarget)
     console.log(documentValue)
 
     const onKeyDown = useCallback(

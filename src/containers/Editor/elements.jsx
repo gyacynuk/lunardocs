@@ -21,19 +21,13 @@ export const Leaf = props => {
     )
   }
 
-const DefaultElementStyle = styled.span`
-    color: ${({ theme }) => theme.palette.text.heavy};
-    font-family: ${({ theme }) => theme.typography.editor.fontFamily};
-    font-weight: ${({ theme }) => theme.typography.editor.fontWeight};
-    font-size: ${({ theme }) => theme.typography.editor.fontSize};
-    line-height: ${({ theme }) => theme.typography.editor.lineHeight};
-`
+
 export const DefaultElement = props => {
     return (
         <div>
-            <DefaultElementStyle {...props.attributes}>
+            <span {...props.attributes}>
                 {props.children}
-            </DefaultElementStyle>
+            </span>
         </div>
         
     )
@@ -43,9 +37,9 @@ const CodeElementStyle = styled.div`
     border-radius: 4px;
     background-color:  ${({ theme }) => theme.palette.text.lighter};
     color: ${({ theme }) => theme.palette.text.heavy};
-    padding: 4px;
+    padding: 8px;
 
-    font-family: ${({ theme }) => theme.typography.codeFontFamily};
+    font-family: ${({ theme }) => theme.typography.codeFontFamily} !important;
     font-weight: ${({ theme }) => theme.typography.editor.fontWeight};
     font-size: ${({ theme }) => theme.typography.editor.fontSize};
     line-height: ${({ theme }) => theme.typography.editor.lineHeight};
