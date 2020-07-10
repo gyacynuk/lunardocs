@@ -45,9 +45,8 @@ const Portal = ({ children }) => {
 }
 
 const insertShortcut = (editor, shortcut) => {
-    const { selection } = editor
     switch (shortcut) {
-        case 'code':
+        case 'code': {
             // Set the text of the selection to be code
             Transforms.setNodes(
                 editor,
@@ -57,18 +56,24 @@ const insertShortcut = (editor, shortcut) => {
         
             // Inserts a space, deleting the shortcut typed while preserving the code styling
             Editor.insertText(editor, ' ')
+
+            const { selection } = editor
+            console.log("selection")
+            console.log(!!selection)
+            console.log(Range.isCollapsed(selection))
+            console.log(`"${Editor.string(editor, selection)}"`)
         
             // Select the inserted space, to facilitate easy typing
             if (selection && Range.isCollapsed(selection)) {
                 const [start] = Range.edges(selection)
-                const charBefore = Editor.before(editor, start, { unit: 'character' })
-                const before = charBefore && Editor.before(editor, charBefore)
+                const before = Editor.before(editor, start)
                 const beforeRange = before && Editor.range(editor, before, start)
                 Transforms.select(editor, beforeRange)
             }
-
             break
-        case 'codeblock':
+        }
+        case 'codeblock': {
+            const { selection } = editor
             // If the current node is empty, then just wrap i
             if (selection) {
                 const [start] = Range.edges(selection)
@@ -98,6 +103,7 @@ const insertShortcut = (editor, shortcut) => {
                 }
             )
             break
+        }
     }
 }
 

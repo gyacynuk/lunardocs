@@ -38,6 +38,7 @@ const CodeElementStyle = styled.div`
     background-color:  ${({ theme }) => theme.palette.text.lighter};
     color: ${({ theme }) => theme.palette.text.heavy};
     padding: 8px;
+    margin: 4px 0px;
 
     font-family: ${({ theme }) => theme.typography.codeFontFamily} !important;
     font-weight: ${({ theme }) => theme.typography.editor.fontWeight};
