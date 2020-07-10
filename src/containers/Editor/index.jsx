@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { createEditor, Editor, Transforms, Range, Text } from 'slate'
+import { createEditor, Editor, Transforms, Range, Text, Node } from 'slate'
 import { Slate, Editable, withReact, ReactEditor, useSelected, useFocused } from 'slate-react'
 import { withHistory } from 'slate-history'
 
@@ -45,6 +45,7 @@ const Portal = ({ children }) => {
 }
 
 const insertShortcut = (editor, shortcut) => {
+    const { selection } = editor
     switch (shortcut) {
         case 'code':
             // Set the text of the selection to be code
@@ -58,7 +59,6 @@ const insertShortcut = (editor, shortcut) => {
             Editor.insertText(editor, ' ')
         
             // Select the inserted space, to facilitate easy typing
-            const { selection } = editor
             if (selection && Range.isCollapsed(selection)) {
                 const [start] = Range.edges(selection)
                 const charBefore = Editor.before(editor, start, { unit: 'character' })
@@ -69,6 +69,24 @@ const insertShortcut = (editor, shortcut) => {
 
             break
         case 'codeblock':
+            // If the current node is empty, then just wrap i
+            if (selection) {
+                const [start] = Range.edges(selection)
+                if (start.path.length > 1) {
+                    let parentPath = start.path.slice(0, start.path.length-1)
+
+                    if (Editor.string(editor, selection) === Editor.string(editor,parentPath)) {
+                        Transforms.wrapNodes(editor, 
+                            { type: 'codeblock', children: [] },
+                            { at: parentPath}
+                        )
+                        // Delete current selection (shortcut typed by user)
+                        Editor.insertText(editor, '')
+                        break
+                    }
+                }
+            }
+
             const codeblock = { type: 'paragraph', children: [{ text: '' }] }
             Transforms.insertNodes(editor, codeblock)
             Transforms.wrapNodes(
@@ -139,7 +157,6 @@ const TextEditor = (props) => {
                     Transforms.select(editor, shortcutTarget)
                     insertShortcut(editor, matchingShortcuts[shortcutDropdownIndex])
                     dispatch(setShortcutTarget(null))
-                    console.log('of fucl')
                     break
                 case 'Escape':
                     event.preventDefault()
