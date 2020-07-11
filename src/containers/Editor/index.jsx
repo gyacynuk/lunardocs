@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useRef, useEffect } from "react";
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -8,7 +7,7 @@ import { Slate, Editable, withReact, ReactEditor, useSelected, useFocused } from
 import { withHistory } from 'slate-history'
 
 import ContentPane from "../../components/ContentPane";
-import ShortcutPortal from './ShortcutPortal'
+import ShortcutPortal, { Portal } from './ShortcutPortal'
 import { CodeElement, DefaultElement, Leaf } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
@@ -26,22 +25,28 @@ const StyledEditable= styled(Editable)`
     line-height: ${({ theme }) => theme.typography.editor.lineHeight};
 `
 
-const withShortcuts = editor => {
-    const { isInline, isVoid } = editor
-  
-    // editor.isInline = element => {
-    //     return element.type === 'code' ? true : isInline(element)
-    // }
+const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
+const SHORTCUTS = [
+    'code',
+    'codeblock',
+    'header-1',
+    'header-2',
+    'header-3',
+    'header-4',
+    'image',
+    'link',
+    'list',
+];
 
-    // editor.isVoid = element => {
-    //     return element.type === 'paragraph' ? false : isVoid(element)
-    // }
-  
-    return editor
-}
+const INLINE_ELEMENTS = [];
+const VOID_ELEMENTS = [];
 
-const Portal = ({ children }) => {
-    return ReactDOM.createPortal(children, document.body)
+const withCustomElements = editor => {
+    const { isInline, isVoid } = editor;
+  
+    editor.isInline = element => INLINE_ELEMENTS.includes(element.type) ? true : isInline(element);
+    editor.isVoid = element => VOID_ELEMENTS.includes(element.type) ? false : isVoid(element);
+    return editor;
 }
 
 const insertShortcut = (editor, shortcut) => {
@@ -57,13 +62,10 @@ const insertShortcut = (editor, shortcut) => {
             // Inserts a space, deleting the shortcut typed while preserving the code styling
             Editor.insertText(editor, ' ')
 
+            // Grab the cursor location
             const { selection } = editor
-            console.log("selection")
-            console.log(!!selection)
-            console.log(Range.isCollapsed(selection))
-            console.log(`"${Editor.string(editor, selection)}"`)
         
-            // Select the inserted space, to facilitate easy typing
+            // Select the previously inserted space, to facilitate easy typing
             if (selection && Range.isCollapsed(selection)) {
                 const [start] = Range.edges(selection)
                 const before = Editor.before(editor, start)
@@ -107,23 +109,11 @@ const insertShortcut = (editor, shortcut) => {
     }
 }
 
-const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
-const SHORTCUTS = [
-    'code',
-    'codeblock',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-];
-
 const TextEditor = (props) => {
     const dispatch = useDispatch();
 
     // Create a Slate editor object that won't change across renders.
-    const editor = useMemo(() => withShortcuts(withReact(withHistory(createEditor()))), []);
+    const editor = useMemo(() => withCustomElements(withReact(withHistory(createEditor()))), []);
 
     const ref = useRef();
 

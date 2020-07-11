@@ -28,8 +28,7 @@ export const DefaultElement = props => {
             <span {...props.attributes}>
                 {props.children}
             </span>
-        </div>
-        
+        </div>    
     )
 }
 
@@ -52,5 +51,3 @@ export const CodeElement = props => {
         </CodeElementStyle>
     )
 }
-
-  

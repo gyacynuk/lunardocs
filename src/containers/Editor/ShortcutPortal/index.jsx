@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -24,5 +25,7 @@ const ShortcutPortal = React.forwardRef((props, ref) => {
 });
 
 ShortcutPortal.propTypes = {};
+
+export const Portal = ({ children }) => ReactDOM.createPortal(children, document.body);
 
 export default ShortcutPortal;
