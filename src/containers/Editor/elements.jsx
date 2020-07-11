@@ -1,5 +1,6 @@
 import React from "react";
 import styled from 'styled-components';
+import { useSelected, useFocused } from 'slate-react'
 
 const DefaultLeafStyle = styled.span``
 const CodeCodeStyle = styled.span`
@@ -49,5 +50,37 @@ export const CodeElement = props => {
         <CodeElementStyle {...props.attributes}>
             {props.children}
         </CodeElementStyle>
+    )
+}
+
+const ImageOuterWrapper = styled.div`
+    width: 100%;
+    margin: 8px 0;
+`
+const ImageInnerWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    width: 100%;
+`
+const ImageStyle = styled.img`
+    display: block;
+    max-width: 100%;
+    max-height: 20em;
+    border-radius: 4px;
+    box-shadow: ${props => props.highlight ? `0 0 0 4px ${props.theme.palette.accent.light}` : `none`};
+`
+export const ImageElement = ({ attributes, children, element }) => {
+    const selected = useSelected()
+    const focused = useFocused()
+    return (
+        <ImageOuterWrapper {...attributes}>
+            <ImageInnerWrapper contentEditable={false}>
+                <ImageStyle
+                    src={element.url}
+                    highlight={selected && focused}
+                />
+            </ImageInnerWrapper>
+            {children}
+      </ImageOuterWrapper>
     )
 }

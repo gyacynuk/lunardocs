@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useRef, useEffect } from "react";
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import imageExtensions from 'image-extensions'
+import isUrl from 'is-url'
 
 import { createEditor, Editor, Transforms, Range, Text, Node } from 'slate'
 import { Slate, Editable, withReact, ReactEditor, useSelected, useFocused } from 'slate-react'
@@ -8,11 +10,12 @@ import { withHistory } from 'slate-history'
 
 import ContentPane from "../../components/ContentPane";
 import ShortcutPortal, { Portal } from './ShortcutPortal'
-import { CodeElement, DefaultElement, Leaf } from "./elements";
+import ShortcutItem from "./ShortcutPortal/shortcutItem";
+import { CodeElement, DefaultElement, Leaf, ImageElement } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
 import { setActiveDocumentValue, setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex } from "../../store/actions";
-import ShortcutItem from "./ShortcutPortal/shortcutItem";
+import { isNodeEmptyAsideFromSelection, getParentPath } from './utils';
 
 const StyledEditable= styled(Editable)`
     height: 100%;
@@ -27,26 +30,82 @@ const StyledEditable= styled(Editable)`
 
 const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
 const SHORTCUTS = [
-    'code',
-    'codeblock',
-    'header-1',
-    'header-2',
-    'header-3',
-    'header-4',
-    'image',
-    'link',
-    'list',
+    { name: 'code' },
+    { name: 'codeblock', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header-1', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header-2', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header-3', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header-4', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'image', nodeProperties: { isInline: false, isVoid: true } },
+    { name: 'link', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'list', nodeProperties: { isInline: false, isVoid: false } },
 ];
+const SHORTCUTS_MAP = SHORTCUTS.reduce((map, shortcut) => (map[shortcut.name] = shortcut, map), {});
 
-const INLINE_ELEMENTS = [];
-const VOID_ELEMENTS = [];
+const getMatchingShortcuts = searchText => SHORTCUTS
+        .map(shortcut => shortcut.name)
+        .filter(shortcut => shortcut.startsWith(searchText.toLowerCase()))
+        .slice(0, MAX_SHORTCUT_DROPDOWN_SIZE);
+
+const isElementInline = name => {
+    const element = SHORTCUTS_MAP[name];
+    if (!element) return false;
+
+    return element.nodeProperties && element.nodeProperties.isInline;
+}
+
+const isElementVoid = name => {
+    const element = SHORTCUTS_MAP[name];
+    if (!element) return false;
+
+    return element.nodeProperties && element.nodeProperties.isVoid;
+}
 
 const withCustomElements = editor => {
-    const { isInline, isVoid } = editor;
+    const { isInline, isVoid, insertData } = editor;
   
-    editor.isInline = element => INLINE_ELEMENTS.includes(element.type) ? true : isInline(element);
-    editor.isVoid = element => VOID_ELEMENTS.includes(element.type) ? false : isVoid(element);
+    editor.isInline = element => isElementInline(element.type) ? true : isInline(element);
+    editor.isVoid = element => isElementVoid(element.type) ? true : isVoid(element);
+
+    editor.insertData = data => {
+        const text = data.getData('text/plain')
+        const { files } = data
+
+        if (files && files.length > 0) {
+            for (const file of files) {
+            const reader = new FileReader()
+            const [mime] = file.type.split('/')
+
+            if (mime === 'image') {
+                reader.addEventListener('load', () => {
+                const url = reader.result
+                insertImage(editor, url)
+                })
+
+                reader.readAsDataURL(file)
+            }
+            }
+        } else if (isImageUrl(text)) {
+            insertImage(editor, text)
+        } else {
+            insertData(data)
+        }
+    }
+
     return editor;
+}
+
+const isImageUrl = url => {
+    if (!url) return false
+    if (!isUrl(url)) return false
+    const ext = new URL(url).pathname.split('.').pop()
+    return imageExtensions.includes(ext)
+}
+
+const insertImage = (editor, url) => {
+    const text = { text: '' }
+    const image = { type: 'image', url, children: [text] }
+    Transforms.insertNodes(editor, image)
 }
 
 const insertShortcut = (editor, shortcut) => {
@@ -75,41 +134,33 @@ const insertShortcut = (editor, shortcut) => {
             break
         }
         case 'codeblock': {
-            const { selection } = editor
-            // If the current node is empty, then just wrap i
-            if (selection) {
-                const [start] = Range.edges(selection)
-                if (start.path.length > 1) {
-                    let parentPath = start.path.slice(0, start.path.length-1)
-
-                    if (Editor.string(editor, selection) === Editor.string(editor,parentPath)) {
-                        Transforms.wrapNodes(editor, 
-                            { type: 'codeblock', children: [] },
-                            { at: parentPath}
-                        )
-                        // Delete current selection (shortcut typed by user)
-                        Editor.insertText(editor, '')
-                        break
-                    }
-                }
+            // If the current node is empty, then just wrap it
+            if (isNodeEmptyAsideFromSelection(editor)) {
+                Transforms.wrapNodes(editor, 
+                    { type: 'codeblock', children: [] },
+                    { at: getParentPath(editor)}
+                )
+                // Delete current selection (shortcut typed by user)
+                Editor.insertText(editor, '')
             }
-
-            const codeblock = { type: 'paragraph', children: [{ text: '' }] }
-            Transforms.insertNodes(editor, codeblock)
-            Transforms.wrapNodes(
-                editor,
-                { type: 'codeblock', children: [] },
-                {
-                  match: node => Editor.isBlock(editor, node),
-                  mode: 'lowest',
-                }
-            )
+            else {
+                const codeblock = { type: 'paragraph', children: [{ text: '' }] }
+                Transforms.insertNodes(editor, codeblock)
+                Transforms.wrapNodes(
+                    editor,
+                    { type: 'codeblock', children: [] },
+                    {
+                      match: node => Editor.isBlock(editor, node),
+                      mode: 'lowest',
+                    }
+                )
+            }
             break
         }
     }
 }
 
-const TextEditor = (props) => {
+const TextEditor = props => {
     const dispatch = useDispatch();
 
     // Create a Slate editor object that won't change across renders.
@@ -123,9 +174,7 @@ const TextEditor = (props) => {
     const shortcutSearch = useSelector(getShortcutSearch);
     const shortcutDropdownIndex = useSelector(getShortcutDropdownIndex);
 
-    const matchingShortcuts = SHORTCUTS.filter(shortcut =>
-        shortcut.startsWith(shortcutSearch.toLowerCase())
-    ).slice(0, MAX_SHORTCUT_DROPDOWN_SIZE);
+    const matchingShortcuts = getMatchingShortcuts(shortcutSearch);
 
     console.log(documentValue)
 
@@ -220,7 +269,7 @@ const TextEditor = (props) => {
           const afterMatch = afterText.match(/^(\s|$)/)
 
           // And in paragraph node
-          if (beforeMatch && afterMatch && SHORTCUTS.filter(shortcut => shortcut.startsWith(beforeMatch[1].toLowerCase())).length != 0) {
+          if (beforeMatch && afterMatch && getMatchingShortcuts(beforeMatch[1].toLowerCase()).length != 0) {
             dispatch(setShortcutTarget(beforeRange))
             dispatch(setShortcutSearch(beforeMatch[1]))
             dispatch(setShortcutDropdownIndex(0))
@@ -235,6 +284,8 @@ const TextEditor = (props) => {
         switch (props.element.type) {
             case 'codeblock':
                 return <CodeElement {...props} />
+            case 'image':
+                return <ImageElement {...props} />
             case 'paragraph':
             default:
                 return <DefaultElement {...props} />
