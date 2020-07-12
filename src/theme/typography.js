@@ -1,4 +1,8 @@
+const fontWeightLight = 300;
 const fontWeightRegular = 400;
+const fontWeightMedium = 500;
+const fontWeightBold = 700;
+
 const fontFamily = '"Barlow", "Helvetica", "Arial", sans-serif';
 const editorFontFamily = '"Barlow", "Helvetica", "Arial", sans-serif';
 const codeFontFamily = '"Source Code Pro", monospace';
@@ -7,10 +11,10 @@ export default {
   htmlFontSize: 16,
   fontFamily,
   codeFontFamily,
-  fontWeightLight: 300,
+  fontWeightLight,
   fontWeightRegular,
-  fontWeightMedium: 500,
-  fontWeightBold: 700,
+  fontWeightMedium,
+  fontWeightBold,
   h1: {
     fontFamily: fontFamily,
     fontWeight: fontWeightRegular,
@@ -85,27 +89,21 @@ export default {
 
     h1: {
       fontFamily: fontFamily,
-      fontWeight: fontWeightRegular,
-      fontSize: '2.125rem',
-      lineHeight: 1.1,
-    },
-    h2: {
-      fontFamily: fontFamily,
-      fontWeight: fontWeightRegular,
-      fontSize: '2rem',
+      fontWeight: fontWeightMedium,
+      fontSize: '2.3rem',
       lineHeight: 1.2,
     },
-    h3: {
+    h2: {
       fontFamily: fontFamily,
       fontWeight: fontWeightRegular,
       fontSize: '1.75rem',
       lineHeight: 1.2,
     },
-    h4: {
+    h3: {
       fontFamily: fontFamily,
-      fontWeight: fontWeightRegular,
+      fontWeight: fontWeightLight,
       fontSize: '1.5rem',
-      lineHeight: 1.28,
+      lineHeight: 1.2,
     },
   }
 };

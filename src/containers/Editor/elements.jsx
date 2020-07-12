@@ -47,6 +47,34 @@ export const Header1Element = props => {
     )
 }
 
+const Header2Style = styled.div`
+    font-family: ${({ theme }) => theme.typography.editor.h2.fontFamily};
+    font-weight: ${({ theme }) => theme.typography.editor.h2.fontWeight};
+    font-size: ${({ theme }) => theme.typography.editor.h2.fontSize};
+    line-height: ${({ theme }) => theme.typography.editor.h2.lineHeight};
+`
+export const Header2Element = props => {
+    return (
+        <Header2Style {...props.attributes}>
+            {props.children}
+        </Header2Style>
+    )
+}
+
+const Header3Style = styled.div`
+    font-family: ${({ theme }) => theme.typography.editor.h3.fontFamily};
+    font-weight: ${({ theme }) => theme.typography.editor.h3.fontWeight};
+    font-size: ${({ theme }) => theme.typography.editor.h3.fontSize};
+    line-height: ${({ theme }) => theme.typography.editor.h3.lineHeight};
+`
+export const Header3Element = props => {
+    return (
+        <Header3Style {...props.attributes}>
+            {props.children}
+        </Header3Style>
+    )
+}
+
 const CodeElementStyle = styled.div`
     border-radius: 4px;
     background-color:  ${({ theme }) => theme.palette.text.lighter};

@@ -5,13 +5,13 @@ import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 
 import { createEditor, Editor, Transforms, Range, Text, Node, Path } from 'slate'
-import { Slate, Editable, withReact, ReactEditor, useSelected, useFocused } from 'slate-react'
+import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { withHistory } from 'slate-history'
 
 import ContentPane from "../../components/ContentPane";
 import ShortcutPortal, { Portal } from './ShortcutPortal'
 import ShortcutItem from "./ShortcutPortal/shortcutItem";
-import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element } from "./elements";
+import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header2Element, Header3Element } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
 import { setActiveDocumentValue, setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex } from "../../store/actions";
@@ -32,10 +32,9 @@ const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
 const SHORTCUTS = [
     { name: 'code' },
     { name: 'codeblock', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header-1', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header-2', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header-3', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header-4', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header1', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header2', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header3', nodeProperties: { isInline: false, isVoid: false } },
     { name: 'image', nodeProperties: { isInline: false, isVoid: true } },
     { name: 'link', nodeProperties: { isInline: false, isVoid: false } },
     { name: 'list', nodeProperties: { isInline: false, isVoid: false } },
@@ -136,13 +135,12 @@ const insertShortcut = (editor, shortcut) => {
         case 'codeblock': {
             // If the current node is empty, then just wrap it
             if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
-                Transforms.setNodes(
-                    editor,
+                Transforms.setNodes(editor,
                     { type: 'codeblock' }
                 )
 
                 // Delete current selection (shortcut typed by user)
-                Editor.insertText(editor, '')
+                Transforms.delete(editor)
             }
             else {
                 const codeblock = { type: 'codeblock', children: [{ text: '' }] }
@@ -150,27 +148,50 @@ const insertShortcut = (editor, shortcut) => {
             }
             break
         }
-        case 'header-1': {
+        case 'header1': {
             // If the current node is empty, then just wrap it
             if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
-                Transforms.wrapNodes(editor, 
-                    { type: 'header-1', children: [] },
-                    { at: getParentPath(editor)}
+                Transforms.setNodes(editor,
+                    { type: 'header1' }
                 )
+
                 // Delete current selection (shortcut typed by user)
-                Editor.insertText(editor, '')
+                Transforms.delete(editor)
             } else {
-                const codeblock = { type: 'paragraph', children: [{ text: '' }] }
-                Transforms.insertNodes(editor, codeblock)
-                Transforms.wrapNodes(
-                    editor,
-                    { type: 'codeblock', children: [] },
-                    {
-                      match: node => Editor.isBlock(editor, node),
-                      mode: 'lowest',
-                    }
-                )
+                const header = { type: 'header1', children: [{ text: '' }] }
+                Transforms.insertNodes(editor, header)
             }
+            break
+        }
+        case 'header2': {
+            // If the current node is empty, then just wrap it
+            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
+                Transforms.setNodes(editor,
+                    { type: 'header2' }
+                )
+
+                // Delete current selection (shortcut typed by user)
+                Transforms.delete(editor)
+            } else {
+                const header = { type: 'header2', children: [{ text: '' }] }
+                Transforms.insertNodes(editor, header)
+            }
+            break
+        }
+        case 'header3': {
+            // If the current node is empty, then just wrap it
+            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
+                Transforms.setNodes(editor,
+                    { type: 'header3' }
+                )
+
+                // Delete current selection (shortcut typed by user)
+                Transforms.delete(editor)
+            } else {
+                const header = { type: 'header3', children: [{ text: '' }] }
+                Transforms.insertNodes(editor, header)
+            }
+            break
         }
     }
 }
@@ -296,7 +317,7 @@ const TextEditor = props => {
           const before = wordBefore && Editor.before(editor, wordBefore)
           const beforeRange = before && Editor.range(editor, before, start)
           const beforeText = beforeRange && Editor.string(editor, beforeRange)
-          const beforeMatch = beforeText && beforeText.match(/^\/(\w+)$/)
+          const beforeMatch = beforeText && beforeText.match(/^\/([\w\-]+)$/)
           const after = Editor.after(editor, start)
           const afterRange = Editor.range(editor, start, after)
           const afterText = Editor.string(editor, afterRange)
@@ -318,8 +339,12 @@ const TextEditor = props => {
         switch (props.element.type) {
             case 'codeblock':
                 return <CodeElement {...props} />
-            case 'header-1':
+            case 'header1':
                 return <Header1Element {...props} />
+            case 'header2':
+                return <Header2Element {...props} />
+            case 'header3':
+                return <Header3Element {...props} />
             case 'image':
                 return <ImageElement {...props} />
             case 'paragraph':
