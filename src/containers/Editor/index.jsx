@@ -4,18 +4,18 @@ import styled from 'styled-components';
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 
-import { createEditor, Editor, Transforms, Range, Text, Node } from 'slate'
+import { createEditor, Editor, Transforms, Range, Text, Node, Path } from 'slate'
 import { Slate, Editable, withReact, ReactEditor, useSelected, useFocused } from 'slate-react'
 import { withHistory } from 'slate-history'
 
 import ContentPane from "../../components/ContentPane";
 import ShortcutPortal, { Portal } from './ShortcutPortal'
 import ShortcutItem from "./ShortcutPortal/shortcutItem";
-import { CodeElement, DefaultElement, Leaf, ImageElement } from "./elements";
+import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
 import { setActiveDocumentValue, setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex } from "../../store/actions";
-import { isNodeEmptyAsideFromSelection, getParentPath } from './utils';
+import { isNodeEmptyAsideFromSelection, getCurrentPath, getParentPath } from './utils';
 
 const StyledEditable= styled(Editable)`
     height: 100%;
@@ -73,17 +73,17 @@ const withCustomElements = editor => {
 
         if (files && files.length > 0) {
             for (const file of files) {
-            const reader = new FileReader()
-            const [mime] = file.type.split('/')
+                const reader = new FileReader()
+                const [mime] = file.type.split('/')
 
-            if (mime === 'image') {
-                reader.addEventListener('load', () => {
-                const url = reader.result
-                insertImage(editor, url)
-                })
+                if (mime === 'image') {
+                    reader.addEventListener('load', () => {
+                        const url = reader.result
+                        insertImage(editor, url)
+                    })
 
-                reader.readAsDataURL(file)
-            }
+                    reader.readAsDataURL(file)
+                }
             }
         } else if (isImageUrl(text)) {
             insertImage(editor, text)
@@ -135,15 +135,31 @@ const insertShortcut = (editor, shortcut) => {
         }
         case 'codeblock': {
             // If the current node is empty, then just wrap it
-            if (isNodeEmptyAsideFromSelection(editor)) {
-                Transforms.wrapNodes(editor, 
-                    { type: 'codeblock', children: [] },
-                    { at: getParentPath(editor)}
+            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
+                Transforms.setNodes(
+                    editor,
+                    { type: 'codeblock' }
                 )
+
                 // Delete current selection (shortcut typed by user)
                 Editor.insertText(editor, '')
             }
             else {
+                const codeblock = { type: 'codeblock', children: [{ text: '' }] }
+                Transforms.insertNodes(editor, codeblock)
+            }
+            break
+        }
+        case 'header-1': {
+            // If the current node is empty, then just wrap it
+            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
+                Transforms.wrapNodes(editor, 
+                    { type: 'header-1', children: [] },
+                    { at: getParentPath(editor)}
+                )
+                // Delete current selection (shortcut typed by user)
+                Editor.insertText(editor, '')
+            } else {
                 const codeblock = { type: 'paragraph', children: [{ text: '' }] }
                 Transforms.insertNodes(editor, codeblock)
                 Transforms.wrapNodes(
@@ -155,7 +171,6 @@ const insertShortcut = (editor, shortcut) => {
                     }
                 )
             }
-            break
         }
     }
 }
@@ -210,6 +225,26 @@ const TextEditor = props => {
                 }
             }
             switch (event.key) {
+            case 'Enter': 
+                if (event.shiftKey) {
+                    const [matchingCodeblock] = Editor.nodes(editor, {
+                        at: getCurrentPath(editor),
+                        match: n => n.type === 'codeblock',
+                    })
+                    
+                    if (!!matchingCodeblock) {
+                        event.preventDefault();
+                        Editor.insertText(editor, '\r\n');
+                        break
+                    }
+                }
+
+                if (!shortcutTarget) {
+                    event.preventDefault();
+                    const paragraph = { type: 'paragraph', children: [{ text: '' }] }
+                    Transforms.insertNodes(editor, paragraph)
+                }
+                break
             case 'ArrowRight':
                 const { selection } = editor
 
@@ -236,7 +271,6 @@ const TextEditor = props => {
                         );
                     }
                 }
-                break
             }
         },
         [shortcutTarget, shortcutSearch, shortcutDropdownIndex]
@@ -284,6 +318,8 @@ const TextEditor = props => {
         switch (props.element.type) {
             case 'codeblock':
                 return <CodeElement {...props} />
+            case 'header-1':
+                return <Header1Element {...props} />
             case 'image':
                 return <ImageElement {...props} />
             case 'paragraph':

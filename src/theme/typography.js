@@ -82,5 +82,30 @@ export default {
     fontWeight: fontWeightRegular,
     fontSize: '1rem',
     lineHeight: 1.5,
+
+    h1: {
+      fontFamily: fontFamily,
+      fontWeight: fontWeightRegular,
+      fontSize: '2.125rem',
+      lineHeight: 1.1,
+    },
+    h2: {
+      fontFamily: fontFamily,
+      fontWeight: fontWeightRegular,
+      fontSize: '2rem',
+      lineHeight: 1.2,
+    },
+    h3: {
+      fontFamily: fontFamily,
+      fontWeight: fontWeightRegular,
+      fontSize: '1.75rem',
+      lineHeight: 1.2,
+    },
+    h4: {
+      fontFamily: fontFamily,
+      fontWeight: fontWeightRegular,
+      fontSize: '1.5rem',
+      lineHeight: 1.28,
+    },
   }
 };

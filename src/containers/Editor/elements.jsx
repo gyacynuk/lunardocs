@@ -33,6 +33,20 @@ export const DefaultElement = props => {
     )
 }
 
+const Header1Style = styled.div`
+    font-family: ${({ theme }) => theme.typography.editor.h1.fontFamily};
+    font-weight: ${({ theme }) => theme.typography.editor.h1.fontWeight};
+    font-size: ${({ theme }) => theme.typography.editor.h1.fontSize};
+    line-height: ${({ theme }) => theme.typography.editor.h1.lineHeight};
+`
+export const Header1Element = props => {
+    return (
+        <Header1Style {...props.attributes}>
+            {props.children}
+        </Header1Style>
+    )
+}
+
 const CodeElementStyle = styled.div`
     border-radius: 4px;
     background-color:  ${({ theme }) => theme.palette.text.lighter};
@@ -40,7 +54,7 @@ const CodeElementStyle = styled.div`
     padding: 8px;
     margin: 4px 0px;
 
-    font-family: ${({ theme }) => theme.typography.codeFontFamily} !important;
+    font-family: ${({ theme }) => theme.typography.codeFontFamily};
     font-weight: ${({ theme }) => theme.typography.editor.fontWeight};
     font-size: ${({ theme }) => theme.typography.editor.fontSize};
     line-height: ${({ theme }) => theme.typography.editor.lineHeight};
