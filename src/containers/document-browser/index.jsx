@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import Divider from './Divider';
-import Document from './Document';
-import DocumentFilter from './DocumentFilter';
-import SearchBar from './SearchBar';
-import Spacer from '../../components/Spacer';
-import NewDocumentButton from './NewDocumentButton';
-import ContentPane from '../../components/ContentPane';
+import Divider from './divider';
+import Document from './document';
+import DocumentFilter from './document-filter';
+import SearchBar from './search-bar';
+import Spacer from '../../components/spacer';
+import NewDocumentButton from './new-document-button';
+import ContentPane from '../../components/content-pane';
 
 const ScrollableContainer = styled.div`
     width: 100%;

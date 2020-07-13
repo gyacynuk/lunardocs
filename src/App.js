@@ -5,9 +5,9 @@ import styled, { ThemeProvider } from 'styled-components';
 import { getTheme } from './store/selectors';
 import { lightTheme, darkTheme } from './theme';
 import GlobalStyle from './theme/globalStyle'
-import NavBar from './components/Navbar'
-import DocumentBrowser from './containers/DocumentBrowser';
-import Editor from './containers/Editor';
+import NavBar from './components/navbar'
+import DocumentBrowser from './containers/document-browser';
+import Editor from './containers/editor';
 
 const AppContainer = styled.div`
     position: fixed;

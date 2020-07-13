@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import PropTypes from 'prop-types';
-import RowItem from '../RowItem';
+import RowItem from '../row-item';
 import styled from 'styled-components';
 
 import { ReactComponent as PlusSVG } from '../../../assets/icons/plus.svg';

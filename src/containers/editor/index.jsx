@@ -8,9 +8,9 @@ import { createEditor, Editor, Transforms, Range, Text, Node, Path } from 'slate
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { withHistory } from 'slate-history'
 
-import ContentPane from "../../components/ContentPane";
-import ShortcutPortal, { Portal } from './ShortcutPortal'
-import ShortcutItem from "./ShortcutPortal/shortcutItem";
+import ContentPane from "../../components/content-pane";
+import ShortcutPortal, { Portal } from './shortcut-portal'
+import ShortcutItem from "./shortcut-portal/shortcutItem";
 import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header2Element, Header3Element } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
