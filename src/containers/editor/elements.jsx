@@ -2,26 +2,31 @@ import React from "react";
 import styled from 'styled-components';
 import { useSelected, useFocused } from 'slate-react'
 
-const DefaultLeafStyle = styled.span``
 const CodeCodeStyle = styled.span`
     border-radius: 4px;
     background-color: ${({ theme }) => theme.palette.text.lighter};
     font-family: ${({ theme }) => theme.typography.codeFontFamily};
     padding: 0 4px;
 `
-export const Leaf = props => {
-    var LeafComponent = DefaultLeafStyle;
-    if (props.leaf.isCode) {
-        LeafComponent = CodeCodeStyle;
+export const Leaf = ({ attributes, children, leaf }) => {
+    if (leaf.bold) {
+        children = <strong>{children}</strong>
     }
-
-    return (
-      <LeafComponent {...props} {...props.attributes}>
-        {props.children}
-      </LeafComponent>
-    )
-  }
-
+    
+    if (leaf.code) {
+        children = <CodeCodeStyle>{children}</CodeCodeStyle>
+    }
+    
+    if (leaf.italic) {
+        children = <em>{children}</em>
+    }
+    
+    if (leaf.underline) {
+        children = <u>{children}</u>
+    }
+    
+    return <span {...attributes}>{children}</span>
+}
 
 export const DefaultElement = props => {
     return (

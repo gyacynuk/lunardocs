@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+import isHotkey, { toKeyName } from 'is-hotkey'
 
 import { createEditor, Editor, Transforms, Range, Text, Node, Path } from 'slate'
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
@@ -27,6 +28,13 @@ const StyledEditable= styled(Editable)`
     font-size: ${({ theme }) => theme.typography.editor.fontSize};
     line-height: ${({ theme }) => theme.typography.editor.lineHeight};
 `
+
+const LIST_TYPES = ['numbered-list', 'bulleted-list']
+const HOTKEYS = {
+    'mod+b': 'bold',
+    'mod+i': 'italic',
+    'mod+u': 'underline',
+}
 
 const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
 const SHORTCUTS = [
@@ -110,26 +118,11 @@ const insertImage = (editor, url) => {
 const insertShortcut = (editor, shortcut) => {
     switch (shortcut) {
         case 'code': {
-            // Set the text of the selection to be code
-            Transforms.setNodes(
-                editor,
-                { isCode: true },
-                { match: n => Text.isText(n), split: true }
-            );
-        
-            // Inserts a space, deleting the shortcut typed while preserving the code styling
-            Editor.insertText(editor, ' ')
+            // Delete current selection (shortcut typed by user)
+            Transforms.delete(editor)
 
-            // Grab the cursor location
-            const { selection } = editor
-        
-            // Select the previously inserted space, to facilitate easy typing
-            if (selection && Range.isCollapsed(selection)) {
-                const [start] = Range.edges(selection)
-                const before = Editor.before(editor, start)
-                const beforeRange = before && Editor.range(editor, before, start)
-                Transforms.select(editor, beforeRange)
-            }
+            // Set mark to code
+            toggleMark(editor, 'code');
             break
         }
         case 'codeblock': {
@@ -196,6 +189,48 @@ const insertShortcut = (editor, shortcut) => {
     }
 }
 
+const isMarkActive = (editor, format) => {
+    const marks = Editor.marks(editor)
+    return marks ? marks[format] === true : false
+}
+
+const toggleMark = (editor, format) => {
+    const isActive = isMarkActive(editor, format)
+  
+    if (isActive) {
+        Editor.removeMark(editor, format)
+    } else {
+        Editor.addMark(editor, format, true)
+    }
+}
+
+const isBlockActive = (editor, format) => {
+    const [match] = Editor.nodes(editor, {
+        match: n => n.type === format,
+    })
+  
+    return !!match
+}
+
+const toggleBlock = (editor, format) => {
+    const isActive = isBlockActive(editor, format)
+    const isList = LIST_TYPES.includes(format)
+  
+    Transforms.unwrapNodes(editor, {
+        match: n => LIST_TYPES.includes(n.type),
+        split: true,
+    })
+  
+    Transforms.setNodes(editor, {
+        type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+    })
+  
+    if (!isActive && isList) {
+        const block = { type: format, children: [] }
+        Transforms.wrapNodes(editor, block)
+    }
+}
+
 const TextEditor = props => {
     const dispatch = useDispatch();
 
@@ -245,6 +280,20 @@ const TextEditor = props => {
                     break
                 }
             }
+
+            // Apply marks from hotkeys
+            for (const hotkey in HOTKEYS) {
+                if (isHotkey(hotkey, event)) {
+                    event.preventDefault()
+                    const mark = HOTKEYS[hotkey]
+                    toggleMark(editor, mark)
+                    console.log(hotkey)
+                    console.log(toKeyName('`'))
+                    return
+                }
+            }
+
+            // Handle special logic
             switch (event.key) {
             case 'Enter': 
                 if (event.shiftKey) {
@@ -266,32 +315,6 @@ const TextEditor = props => {
                     Transforms.insertNodes(editor, paragraph)
                 }
                 break
-            case 'ArrowRight':
-                const { selection } = editor
-
-                if (selection && Range.isCollapsed(selection)) {
-                    const [start] = Range.edges(selection)
-                    const after = Editor.after(editor, start, { unit: 'character' })
-                    const afterRange = Editor.range(editor, start, after)
-                    const afterText = Editor.string(editor, afterRange)
-                    const afterMatch = afterText.match(/^$/)
-
-                    const [match] = Editor.nodes(editor, {
-                        match: n => n['isCode']
-                    })
-
-                    if (afterMatch && !!match) {
-                        event.preventDefault()
-                        Editor.insertText(editor, ' ')
-                        const newAfter = Editor.after(editor, start, { unit: 'character' })
-                        const newAfterRange = Editor.range(editor, start, newAfter)
-                        Transforms.setNodes(
-                            editor,
-                            { isCode: false },
-                            { at: newAfterRange, match: n => Text.isText(n), split: true }
-                        );
-                    }
-                }
             }
         },
         [shortcutTarget, shortcutSearch, shortcutDropdownIndex]
