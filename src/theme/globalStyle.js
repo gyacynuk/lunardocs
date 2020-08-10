@@ -8,7 +8,7 @@ export default createGlobalStyle`
     transition: color 400ms ease;
     transition: background-color 400ms ease;
   }
-
+  
   html {
     font-size: ${({ theme }) => theme.typography.htmlFontSize}px;
     font-family: ${({ theme }) => theme.typography.fontFamily};
