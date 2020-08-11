@@ -4,6 +4,8 @@ const navBarPaddingY = 24;
 
 const dotSize = 14;
 
+const editorToolBarHeight = 32;
+
 export default {
     navBar: {
         height: `${navBarHeight}px`,
@@ -40,5 +42,8 @@ export default {
     },
     browser: {
         dotSize: `${dotSize}px`,
+    },
+    editor: {
+        toolBarHeight: `${editorToolBarHeight}px`,
     }
 }

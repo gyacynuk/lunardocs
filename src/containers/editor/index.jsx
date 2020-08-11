@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useEffect } from "react";
+import React, { useCallback, useMemo, useRef, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import imageExtensions from 'image-extensions'
@@ -6,20 +6,22 @@ import isUrl from 'is-url'
 import isHotkey, { toKeyName } from 'is-hotkey'
 
 import { createEditor, Editor, Transforms, Range, Text, Node, Path } from 'slate'
-import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
+import { Slate, Editable, withReact, ReactEditor, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
 
 import ContentPane from "../../components/content-pane";
-import ShortcutPortal, { Portal } from './shortcut-portal'
-import ShortcutItem from "./shortcut-portal/shortcutItem";
+import Portal from '../../components/portal'
 import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header2Element, Header3Element } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
 import { setActiveDocumentValue, setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex } from "../../store/actions";
 import { isNodeEmptyAsideFromSelection, getCurrentPath, getParentPath } from './utils';
+import ToolBar from "./tool-bar";
+import ToolBarButton from "./tool-bar-button";
+import DropDown from "../../components/drop-down";
 
-const StyledEditable= styled(Editable)`
-    height: 100%;
+const StyledEditable = styled(Editable)`
+    height: calc(100% - ${({ theme }) => theme.constants.editor.toolBarHeight});
     overflow-y: auto;
 
     color: ${({ theme }) => theme.palette.text.heavy};
@@ -196,11 +198,15 @@ const isMarkActive = (editor, format) => {
 
 const toggleMark = (editor, format) => {
     const isActive = isMarkActive(editor, format)
+
+    console.log(`isActive: ${isActive}`)
   
     if (isActive) {
         Editor.removeMark(editor, format)
+        console.log('removed')
     } else {
         Editor.addMark(editor, format, true)
+        console.log('added')
     }
 }
 
@@ -247,6 +253,15 @@ const TextEditor = props => {
 
     const matchingShortcuts = getMatchingShortcuts(shortcutSearch);
 
+    const [dropDownState, setDropDownState] = useState(false);
+
+    const applyShortcut = (shortcut) => {
+        console.log('work')
+        Transforms.select(editor, shortcutTarget)
+        insertShortcut(editor, shortcut)
+        dispatch(setShortcutTarget(null))
+    }
+
     console.log(documentValue)
 
     const onKeyDown = useCallback(
@@ -270,9 +285,7 @@ const TextEditor = props => {
                 case 'Tab':
                 case 'Enter':
                     event.preventDefault()
-                    Transforms.select(editor, shortcutTarget)
-                    insertShortcut(editor, matchingShortcuts[shortcutDropdownIndex])
-                    dispatch(setShortcutTarget(null))
+                    applyShortcut(matchingShortcuts[shortcutDropdownIndex])
                     break
                 case 'Escape':
                     event.preventDefault()
@@ -287,8 +300,6 @@ const TextEditor = props => {
                     event.preventDefault()
                     const mark = HOTKEYS[hotkey]
                     toggleMark(editor, mark)
-                    console.log(hotkey)
-                    console.log(toKeyName('`'))
                     return
                 }
             }
@@ -386,29 +397,64 @@ const TextEditor = props => {
             editor={editor}
             value={documentValue}
             onChange={onChange}>
-                <StyledEditable
-                autoFocus={true}
+            <ToolBar>
+                <ToolBarButton active={false} onClick={() => setDropDownState(!dropDownState)}>
+                    Header 1
+                    {dropDownState && (
+                        <DropDown
+                        margin={'4px 0 0 -7px'}
+                        items={['Header 1', 'Header 2', 'Header 3', 'Paragraph', 'Code Block']}
+                        selectedIndex={0}
+                        onSelected={item => console.log(item)}/>
+                    )}
+                </ToolBarButton>
+                <MarkButton format={'bold'}>
+                    <strong>B</strong>
+                </MarkButton>
+                <MarkButton format={'italic'}>
+                    <em>I</em>
+                </MarkButton>
+                <MarkButton format={'underline'}>
+                    <u>U</u>
+                </MarkButton>
+                <MarkButton format={'code'}>
+                    <code>{'<>'}</code>
+                </MarkButton>
+            </ToolBar>
+            <StyledEditable
+                autoFocus
+                spellCheck
                 onKeyDown={onKeyDown}
                 placeholder={'Write something here...'}
                 renderElement={renderElement}
                 renderLeaf={renderLeaf}/>
                 {shortcutTarget && matchingShortcuts.length > 0 && (
                     <Portal>
-                    <ShortcutPortal ref={ref}>
-                        {matchingShortcuts.map((shortcut, i) => (
-                        <ShortcutItem
-                        key={shortcut}
-                        isSelected={i === shortcutDropdownIndex}>
-                            {shortcut}
-                        </ShortcutItem>
-                        ))}
-                    </ShortcutPortal>
+                        <DropDown
+                        ref={ref}
+                        items={matchingShortcuts}
+                        selectedIndex={shortcutDropdownIndex}
+                        onSelected={i => applyShortcut(matchingShortcuts[i])}/>
                     </Portal>
                 )}
             </Slate>
         </ContentPane>
     );
 };
+
+const MarkButton = ({ format, children }) => {
+    const editor = useSlate();
+    return (
+        <ToolBarButton active={isMarkActive(editor, format)} onMouseDown={event => {
+            event.preventDefault();
+            console.log(isMarkActive(editor, format))
+            toggleMark(editor, format);
+            console.log(isMarkActive(editor, format))
+        }}>
+            {children}
+        </ToolBarButton>
+    )
+}
 
 TextEditor.propTypes = {};
 
