@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -24,6 +24,25 @@ const DropDownItem = styled.div`
 `
 
 const DropDown = React.forwardRef((props, ref) => {
+    if (!ref) {
+        ref = useRef();
+    }
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (ref.current && !ref.current.contains(event.target)) {
+                props.onClickOutside && props.onClickOutside();
+            }
+        }
+
+        // Bind the event listener
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            // Unbind the event listener on clean up
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [ref]);
+
     return (
         <DropDownContainer ref={ref} margin={props.margin}>
             {props.items.map((item, index) => (
@@ -43,6 +62,11 @@ DropDown.propTypes = {
     items: PropTypes.arrayOf(PropTypes.string),
     isSelected: PropTypes.func,
     onSelected: PropTypes.func,
+    onClickOutside: PropTypes.func,
 };
+
+DropDown.defaultProps = {
+    onClickOutside: () => {}
+}
 
 export default DropDown;

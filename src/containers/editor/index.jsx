@@ -463,7 +463,8 @@ const BlockDropDown = ({ dropDownState, setDropDownState }) => {
                 margin={'4px 0 0 -7px'}
                 items={BLOCK_TYPES.map(blockType => blockType.name)}
                 isSelected={(e, i) => currentBlockType && e === currentBlockType.name}
-                onSelected={(e, i) => setBlock(editor, BLOCK_TYPES[i].type)}/>
+                onSelected={(e, i) => setBlock(editor, BLOCK_TYPES[i].type)}
+                onClickOutside={() => setDropDownState(false)}/>
             )}
         </ToolBarDropDown>
     )
