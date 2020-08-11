@@ -1,3 +1,6 @@
+// Auth
+export const SET_AUTH_USER = 'SET_AUTH_USER'
+
 // Themeing and display
 export const TOGGLE_DISPLAY_MODE = 'TOGGLE_DISPLAY_MODE';
 

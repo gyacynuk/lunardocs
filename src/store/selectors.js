@@ -1,5 +1,10 @@
 import { VISIBILITY_FILTERS } from "./constants";
 
+// Authorization
+export const isUserSignedIn = store => !!store.auth.user;
+export const isAuthPending = store => store.auth.pending;
+export const getAuthUser = store => store.auth.user;
+
 // Themeing and display
 export const getTheme = store => store.display.theme;
 

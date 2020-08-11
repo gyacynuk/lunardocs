@@ -1,5 +1,5 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled, { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import firebase from 'firebase';
@@ -14,6 +14,9 @@ import LandingPage from './containers/landing-page';
 import LoginPage from './containers/login-page';
 import './App.css'
 import EditorNavBar from './containers/editor/editor-nav-bar';
+import { setAuthUser } from './store/actions';
+import PrivateRoute from './components/private-route';
+import PageLoadingAnimation from './components/page-loading-animation';
 
 firebase.initializeApp({
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
@@ -38,7 +41,14 @@ const AppContainer = styled.div`
 `;
 
 const App = () => {
+    const dispatch = useDispatch();
     const theme = useSelector(getTheme);
+
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged((user) => {
+            dispatch(setAuthUser(user))
+        });
+    }, []);
     
     return (
         <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -46,16 +56,20 @@ const App = () => {
             <Router>
                 <AppContainer>
                     <Switch>
+                        <Route path="/loading" exact>
+                        <NavBar/>
+                        <PageLoadingAnimation/>
+                        </Route>
                         <Route path="/" exact component={LandingPage}/>
                         <Route path="/login" exact component={LoginPage}/>
-                        <Route path="/documents" exact>
+                        <PrivateRoute path="/documents" exact>
                             <NavBar/>
                             <DocumentBrowser/>
-                        </Route>
-                        <Route path="/documents/edit/:id" exact>
+                        </PrivateRoute>
+                        <PrivateRoute path="/documents/edit/:id" exact>
                             <EditorNavBar/>
                             <Editor/>
-                        </Route>
+                        </PrivateRoute>
                     </Switch>
                 </AppContainer>
             </Router>
