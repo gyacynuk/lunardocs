@@ -19,6 +19,7 @@ import { isNodeEmptyAsideFromSelection, getCurrentPath, getParentPath } from './
 import ToolBar from "./tool-bar";
 import ToolBarButton from "./tool-bar-button";
 import DropDown from "../../components/drop-down";
+import ToolBarDropDown from "./tool-bar-drop-down";
 
 const StyledEditable = styled(Editable)`
     height: calc(100% - ${({ theme }) => theme.constants.editor.toolBarHeight});
@@ -31,6 +32,13 @@ const StyledEditable = styled(Editable)`
     line-height: ${({ theme }) => theme.typography.editor.lineHeight};
 `
 
+const BLOCK_TYPES = [
+    {type: 'header1', name: 'Header 1'},
+    {type: 'header2', name: 'Header 2'},
+    {type: 'header3', name: 'Header 3'},
+    {type: 'paragraph', name: 'Paragraph '},
+    {type: 'codeblock', name: 'Code Block'},
+]
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const HOTKEYS = {
     'mod+b': 'bold',
@@ -214,12 +222,13 @@ const isBlockActive = (editor, format) => {
     const [match] = Editor.nodes(editor, {
         match: n => n.type === format,
     })
+
+    Editor.nodes(editor)
   
     return !!match
 }
 
-const toggleBlock = (editor, format) => {
-    const isActive = isBlockActive(editor, format)
+const setBlock = (editor, format) => {
     const isList = LIST_TYPES.includes(format)
   
     Transforms.unwrapNodes(editor, {
@@ -228,10 +237,10 @@ const toggleBlock = (editor, format) => {
     })
   
     Transforms.setNodes(editor, {
-        type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+        type: format
     })
   
-    if (!isActive && isList) {
+    if (isList) {
         const block = { type: format, children: [] }
         Transforms.wrapNodes(editor, block)
     }
@@ -256,7 +265,6 @@ const TextEditor = props => {
     const [dropDownState, setDropDownState] = useState(false);
 
     const applyShortcut = (shortcut) => {
-        console.log('work')
         Transforms.select(editor, shortcutTarget)
         insertShortcut(editor, shortcut)
         dispatch(setShortcutTarget(null))
@@ -391,6 +399,8 @@ const TextEditor = props => {
         return <Leaf {...props} />
     }, []);
 
+    const currentBlockType = BLOCK_TYPES.find(blockType => isBlockActive(editor, blockType.type))
+
     return (
         <ContentPane>
             <Slate
@@ -398,16 +408,7 @@ const TextEditor = props => {
             value={documentValue}
             onChange={onChange}>
             <ToolBar>
-                <ToolBarButton active={false} onClick={() => setDropDownState(!dropDownState)}>
-                    Header 1
-                    {dropDownState && (
-                        <DropDown
-                        margin={'4px 0 0 -7px'}
-                        items={['Header 1', 'Header 2', 'Header 3', 'Paragraph', 'Code Block']}
-                        selectedIndex={0}
-                        onSelected={item => console.log(item)}/>
-                    )}
-                </ToolBarButton>
+                <BlockDropDown dropDownState={dropDownState} setDropDownState={setDropDownState}/>
                 <MarkButton format={'bold'}>
                     <strong>B</strong>
                 </MarkButton>
@@ -433,8 +434,8 @@ const TextEditor = props => {
                         <DropDown
                         ref={ref}
                         items={matchingShortcuts}
-                        selectedIndex={shortcutDropdownIndex}
-                        onSelected={i => applyShortcut(matchingShortcuts[i])}/>
+                        isSelected={(e, i) => i === shortcutDropdownIndex}
+                        onSelected={(e, i) => applyShortcut(matchingShortcuts[i])}/>
                     </Portal>
                 )}
             </Slate>
@@ -445,14 +446,26 @@ const TextEditor = props => {
 const MarkButton = ({ format, children }) => {
     const editor = useSlate();
     return (
-        <ToolBarButton active={isMarkActive(editor, format)} onMouseDown={event => {
-            event.preventDefault();
-            console.log(isMarkActive(editor, format))
-            toggleMark(editor, format);
-            console.log(isMarkActive(editor, format))
-        }}>
+        <ToolBarButton active={isMarkActive(editor, format)} onMouseDown={() => toggleMark(editor, format)}>
             {children}
         </ToolBarButton>
+    )
+}
+
+const BlockDropDown = ({ dropDownState, setDropDownState }) => {
+    const editor = useSlate();
+    const currentBlockType = BLOCK_TYPES.find(blockType => isBlockActive(editor, blockType.type))
+    return (
+        <ToolBarDropDown active={false} onMouseDown={() => setDropDownState(!dropDownState)}>
+            {currentBlockType ? currentBlockType.name : 'Paragraph'}
+            {dropDownState && (
+                <DropDown
+                margin={'4px 0 0 -7px'}
+                items={BLOCK_TYPES.map(blockType => blockType.name)}
+                isSelected={(e, i) => currentBlockType && e === currentBlockType.name}
+                onSelected={(e, i) => setBlock(editor, BLOCK_TYPES[i].type)}/>
+            )}
+        </ToolBarDropDown>
     )
 }
 

@@ -14,11 +14,13 @@ const DropDownContainer = styled.div`
 `
 
 const DropDownItem = styled.div`
-    cursor: pointer;
     padding: 1px 3px;
+    margin: 2px 0;
     border-radius: 4px;
+
     color: ${({ theme }) => theme.palette.text.heavy};
     background-color: ${props => props.isSelected ? props.theme.palette.accent.light : 'transparent'};
+    cursor: pointer;
 `
 
 const DropDown = React.forwardRef((props, ref) => {
@@ -27,8 +29,8 @@ const DropDown = React.forwardRef((props, ref) => {
             {props.items.map((item, index) => (
                 <DropDownItem
                 key={index}
-                isSelected={props.selectedIndex===index}
-                onMouseDown={event => { event.preventDefault(); console.log('hey'); props.onSelected(index); }}>
+                isSelected={props.isSelected(item, index)}
+                onMouseDown={event => { event.preventDefault(); props.onSelected(item, index); }}>
                     {item}
                 </DropDownItem>
             ))}
@@ -39,7 +41,7 @@ const DropDown = React.forwardRef((props, ref) => {
 DropDown.propTypes = {
     margin: PropTypes.string,
     items: PropTypes.arrayOf(PropTypes.string),
-    selectedIndex: PropTypes.number,
+    isSelected: PropTypes.func,
     onSelected: PropTypes.func,
 };
 

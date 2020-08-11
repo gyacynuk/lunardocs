@@ -28,13 +28,16 @@ export const Leaf = ({ attributes, children, leaf }) => {
     return <span {...attributes}>{children}</span>
 }
 
+const DefaultElementStyle = styled.div`
+    margin-bottom:  ${({ theme }) => theme.typography.editor.marginBottom};
+`
 export const DefaultElement = props => {
     return (
-        <div>
+        <DefaultElementStyle>
             <span {...props.attributes}>
                 {props.children}
             </span>
-        </div>    
+        </DefaultElementStyle>    
     )
 }
 
@@ -85,7 +88,7 @@ const CodeElementStyle = styled.div`
     background-color:  ${({ theme }) => theme.palette.text.lighter};
     color: ${({ theme }) => theme.palette.text.heavy};
     padding: 8px;
-    margin: 4px 0px;
+    margin-bottom:  ${({ theme }) => theme.typography.editor.marginBottom};
 
     font-family: ${({ theme }) => theme.typography.codeFontFamily};
     font-weight: ${({ theme }) => theme.typography.editor.fontWeight};

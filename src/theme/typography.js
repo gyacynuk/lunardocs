@@ -86,6 +86,7 @@ export default {
     fontWeight: fontWeightRegular,
     fontSize: '1rem',
     lineHeight: 1.5,
+    marginBottom: '.5rem',
 
     h1: {
       fontFamily: fontFamily,

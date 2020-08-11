@@ -12,7 +12,7 @@ const ButtonComponent = styled.div`
 
 const ToolBarButton = props => {
     return (
-        <ButtonComponent {...props}>
+        <ButtonComponent {...props} onMouseDown={event => { event.preventDefault(); props.onMouseDown(event); }}>
             {props.children}
         </ButtonComponent>
     );
