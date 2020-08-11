@@ -88,6 +88,13 @@ export default {
     lineHeight: 1.5,
     marginBottom: '.5rem',
 
+    navBar: {
+      fontFamily: fontFamily,
+      fontWeight: fontWeightBold,
+      fontSize: '1.1rem',
+      lineHeight: 1.2,
+    },
+
     h1: {
       fontFamily: fontFamily,
       fontWeight: fontWeightMedium,

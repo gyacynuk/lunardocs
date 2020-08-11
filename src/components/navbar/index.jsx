@@ -1,25 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
-
-import { toggleDisplayMode } from '../../store/actions'
 
 import { ReactComponent as UserSVG } from '../../assets/icons/user.svg'
-import { ReactComponent as MoonSVG } from '../../assets/icons/moon.svg'
 import { ReactComponent as LightBulbSVG } from '../../assets/icons/lightbulb.svg'
 import { ReactComponent as DocumentsSVG } from '../../assets/icons/documents.svg'
+import ThemeToggleButton from '../theme-toggle-button';
 
 
 const UserIcon = styled(UserSVG)`
     ${({ theme }) => theme.constants.icons.baseStyle}
     ${({ theme }) => theme.constants.icons.strokeStyleWith(theme)}
-`
-
-const MoonIcon = styled(MoonSVG)`
-    ${({ theme }) => theme.constants.icons.baseStyle}
-    ${({ theme }) => theme.constants.icons.strokeStyleWith(theme)}
-    stroke-width: 2;
 `
 
 const LightBulbIcon = styled(LightBulbSVG)`
@@ -32,7 +23,7 @@ const DocumentsIcon = styled(DocumentsSVG)`
     ${({ theme }) => theme.constants.icons.strokeStyleWith(theme)}
 `
 
-const NavBarRow = styled.div`
+export const NavBarRow = styled.div`
     position: fixed;
     top: 0;
     left: 0;
@@ -48,8 +39,6 @@ const NavBarRow = styled.div`
 `
 
 const NavBar = () => {
-    const dispatch = useDispatch();
-
     return (
         <NavBarRow>
             <div>
@@ -57,7 +46,7 @@ const NavBar = () => {
                 <LightBulbIcon/>
             </div>
             <div>
-                <MoonIcon onClick={() => dispatch(toggleDisplayMode())}/>
+                <ThemeToggleButton/>
                 <UserIcon/>
             </div>
         </NavBarRow>

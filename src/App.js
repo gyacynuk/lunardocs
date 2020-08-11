@@ -13,6 +13,7 @@ import Editor from './containers/editor';
 import LandingPage from './containers/landing-page';
 import LoginPage from './containers/login-page';
 import './App.css'
+import EditorNavBar from './containers/editor/editor-nav-bar';
 
 firebase.initializeApp({
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
@@ -52,7 +53,7 @@ const App = () => {
                             <DocumentBrowser/>
                         </Route>
                         <Route path="/documents/edit/:id" exact>
-                            <NavBar/>
+                            <EditorNavBar/>
                             <Editor/>
                         </Route>
                     </Switch>
