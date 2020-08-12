@@ -1,6 +1,6 @@
 export const lightPalette = {
     accent: {
-        regular: '#7c89ff',
+        regular: '#6848db',
         light: '#9da7fa',
     },
     background: '#f6f6f6',
@@ -15,7 +15,7 @@ export const lightPalette = {
 
 export const darkPalette = {
     accent: {
-        regular: '#7c89ff',
+        regular: '#6848db',
         light: '#4350c4',
     },
     background: '#252a31',

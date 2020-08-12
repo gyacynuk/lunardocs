@@ -11,7 +11,7 @@ const oppositeTheme = (theme) => {
 }
 
 const initialState = {
-    theme: LIGHT_THEME
+    theme: DARK_THEME
 };
 
 export default (state = initialState, action) => {

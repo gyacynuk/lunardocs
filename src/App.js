@@ -16,7 +16,6 @@ import './App.css'
 import EditorNavBar from './containers/editor/editor-nav-bar';
 import { setAuthUser } from './store/actions';
 import PrivateRoute from './components/private-route';
-import PageLoadingAnimation from './components/page-loading-animation';
 
 firebase.initializeApp({
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
@@ -37,6 +36,8 @@ const AppContainer = styled.div`
     min-width: 100vw;
     min-height: 100vh;
 
+    overflow-y: auto;
+
     background-color: ${({ theme }) => theme.palette.background};
 `;
 
@@ -48,7 +49,7 @@ const App = () => {
         firebase.auth().onAuthStateChanged((user) => {
             dispatch(setAuthUser(user))
         });
-    }, []);
+    }, [dispatch]);
     
     return (
         <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -56,10 +57,6 @@ const App = () => {
             <Router>
                 <AppContainer>
                     <Switch>
-                        <Route path="/loading" exact>
-                        <NavBar/>
-                        <PageLoadingAnimation/>
-                        </Route>
                         <Route path="/" exact component={LandingPage}/>
                         <Route path="/login" exact component={LoginPage}/>
                         <PrivateRoute path="/documents" exact>
