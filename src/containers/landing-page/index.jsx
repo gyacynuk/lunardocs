@@ -6,7 +6,7 @@ import { ReactComponent as MoonSVG } from '../../assets/images/moon.svg'
 import Spacer from '../../components/spacer';
 import { useRef } from 'react';
 
-const randXPos = () => Math.floor(Math.random() * 100) + 1
+const randXPos = () => Math.floor(Math.random() * 98) + 1
 const randYPos = () => Math.floor(Math.random() * 90) + 1
 const randSize = () => Math.floor(Math.random() * 3) + 1
 const STARS = [...Array(60)]
