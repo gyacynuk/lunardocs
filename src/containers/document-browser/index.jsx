@@ -6,7 +6,6 @@ import Divider from './divider';
 import Document from './document';
 import DocumentFilter from './document-filter';
 import SearchBar from './search-bar';
-import Spacer from '../../components/spacer';
 import NewDocumentButton from './new-document-button';
 import ContentPane from '../../components/content-pane';
 

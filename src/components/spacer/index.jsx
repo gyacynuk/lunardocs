@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 const Container = styled.div`
     width: 100%;
-    height: ${props => props.height}px;
+    height: ${props => props.height};
 `
 
 const Spacer = (props) => {
@@ -14,7 +14,7 @@ const Spacer = (props) => {
 };
 
 Spacer.propTypes = {
-    height: PropTypes.number
+    height: PropTypes.string
 };
 
 export default Spacer;
