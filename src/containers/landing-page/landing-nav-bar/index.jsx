@@ -31,6 +31,12 @@ const Heading = styled.h1`
     font-weight: 700;
 `
 
+const DesktopOnlySlidingButton = styled(SlidingButton)`
+    ${({ theme }) => theme.isMobile`
+        display:none
+    `}
+`
+
 const Button = styled.div`
     width: 120px;
     padding: 8px 0;
@@ -46,6 +52,10 @@ const Button = styled.div`
     background-color: ${props => props.filled ? 'white' : `transparent`};
 
     font-weight: 500;
+
+    ${({ theme }) => theme.isMobile`
+        display:none
+    `}
 `
 
 
@@ -56,13 +66,13 @@ const LandingNavBar = (props) => {
             
             <Group>
                 <Link to='/login'>
-                    <SlidingButton
+                    <DesktopOnlySlidingButton
                     width={'120px'}
                     padding={'8px 0'}
                     color={'white'}
                     hoverColor={'black'}>
                         Login
-                    </SlidingButton>
+                    </DesktopOnlySlidingButton>
                 </Link>
                 
                 <Link to='/login'>
