@@ -107,6 +107,78 @@ const Temp = styled.p`
 `
 
 const LandingPage = () => {
+    const [scrollAtTop, setScrollAtTop] = useState(true)
+    const [state, setState] = useState({});
+    useEffect(() => {
+        state.moonToNav && state.moonToNav.pause();
+        state.moonShrink && state.moonShrink.pause();
+        state.navMove && state.navMove.pause();
+
+        if (!scrollAtTop) {
+            const animations = {
+                ...state,
+                moonToNav: anime({
+                    targets: '.moonWrapper',
+                    rotate: 360,
+                    translateX: '0%',
+                    translateY: '0%',
+                    marginTop: '16px',
+                    marginLeft: '64px',
+                    top: '0%',
+                    left: '0%',
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                }),
+                moonShrink: anime({
+                    targets: '.moon',
+                    width: '32px',
+                    height: '32px',
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                }),
+                navMove: anime({
+                    targets: '.headerHeading',
+                    marginLeft: '48px',
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                }),
+            }
+
+            setState(animations)
+        } else {
+            const animations = {
+                ...state,
+                moonToNav: anime({
+                    targets: '.moonWrapper',
+                    translateX: '-50%',
+                    translateY: '0%',
+                    marginTop: '0px',
+                    marginLeft: '0px',
+                    top: '20%',
+                    left: '50%',
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                }),
+                moonShrink: anime({
+                    targets: '.moon',
+                    width: '96px',
+                    height: '96px',
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                }),
+                navMove: anime({
+                    targets: '.headerHeading',
+                    marginLeft: '0px',
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                }),
+            }
+
+            setState(animations)
+        }
+        
+    }, [scrollAtTop]);
+    
     useEffect(() => {
         let moonAppearAnimation = anime({
             targets: '.moonWrapper',
@@ -136,37 +208,17 @@ const LandingPage = () => {
         })
 
         const handleScroll = event => {
-            moonAppearAnimation.pause();
+            moonAppearAnimation.pause()
             moonGrowAnimation.pause();
-            anime({
-                targets: '.moonWrapper',
-                rotate: 360,
-                translateX: 0,
-                translateY: 0,
-                top: 16,
-                left: 64,
-                duration: 1000,
-                easing: 'easeOutExpo',
-            })
-            anime({
-                targets: '.moon',
-                width: '32px',
-                height: '32px',
-                duration: 1000,
-                easing: 'easeOutExpo',
-            })
-            anime({
-                targets: '.headerHeading',
-                marginLeft: 48,
-                duration: 1000,
-                easing: 'easeOutExpo',
-            })
-
-            document.getElementById('appContainer').removeEventListener('scroll', handleScroll);
+            if (event.target.scrollTop === 0) {
+                setScrollAtTop(true);
+            } else {
+                setScrollAtTop(false);
+            }
         }
-
         document.getElementById('appContainer').addEventListener('scroll', handleScroll);
-    }, []);
+        return () => document.getElementById('appContainer').removeEventListener('scroll', handleScroll);
+    }, [])
     
     return (
         <>
