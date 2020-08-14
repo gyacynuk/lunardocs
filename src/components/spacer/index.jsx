@@ -7,9 +7,9 @@ const Container = styled.div`
     height: ${props => props.height};
 `
 
-const Spacer = (props) => {
+const Spacer = ({height, ...props}) => {
     return (
-        <Container height={props.height}/>
+        <Container height={height} {...props}/>
     );
 };
 

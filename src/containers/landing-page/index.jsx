@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { keyframes } from 'styled-components';
 
 import { ReactComponent as MoonSVG } from '../../assets/images/moon.svg'
 import Spacer from '../../components/spacer';
-import { useRef } from 'react';
+import LandingNavBar from './landing-nav-bar';
+import SlidingButton from '../../components/sliding-button';
+import anime from 'animejs'
 
 const randXPos = () => Math.floor(Math.random() * 98) + 1
 const randYPos = () => Math.floor(Math.random() * 90) + 1
@@ -12,16 +14,6 @@ const randSize = () => Math.floor(Math.random() * 3) + 1
 const STARS = [...Array(60)]
     .map(e => [randYPos(), randXPos(), randSize()]) 
     .map(randData => ({top: randData[0], left: randData[1], size: randData[2]}));
-
-
-const FadeInAnimation = keyframes`
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-`
 
 /**
  * Stars
@@ -32,7 +24,7 @@ const StarWrapper = styled.div`
     height: 100%;
 
     background: rgb(0,0,0);
-    background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(37,42,49,1) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, #1e293b 100%);
 `
 const Star = styled.div`
     position: absolute;
@@ -42,53 +34,37 @@ const Star = styled.div`
     width: ${props => props.size}px;
     height: ${props => props.size}px;
     background-color: white;
+    border-radius: 50%;
 `
 
 /**
  * Moon
  */
-const MoonGrowAnimation = keyframes`
-    0% {
-        transform: scale(0.25);
-    }
-    100% {
-        transform: scale(1);
-    }
-`
-const MoonMoveAnimation = keyframes`
-    0% {
-        transform: rotate(250deg) translate(-50%, 0);
-    }
-    100% {
-        transform: rotate(360deg) translate(-50%, 0);
-    }
-`
 const MoonWrapper = styled.div`
-    position: absolute;
-    top: 30%;
+    position: fixed;
+    top: 20%;
     left: 50%;
-    transform: translate(-50%, 0);
+    height: 80%;
+    z-index: 151;
 
-    height: 70%;
     transform-origin: bottom center;
-    animation: ${MoonMoveAnimation} 3000ms;
-    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+
+    pointer-events: none;
+    will-change: transform;
+    will-change: left, top;
 `
 const MoonImage = styled(MoonSVG)`
-    width: 96px;
-    height: 96px;
-
     border-radius: 50%;
-    box-shadow: 0 0 12px #EBEFF7AA;   
-    
-    animation: ${MoonGrowAnimation} 3000ms;
-    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 0 12px #EBEFF7AA;
+
+    will-change: width, height;
 `
 
 const MainColumn = styled.div`
     position absolute;
     top: 0;
     left: 0;
+    width: 100%; 
 
     padding: 80px 80px;
     ${({ theme }) => theme.isMobile`
@@ -96,13 +72,14 @@ const MainColumn = styled.div`
     `}
 
     display: block;
-    width: 100%;
+    
+    transform: translateZ(0);
 `
 
 const HeroContainer = styled.div`
     position: absolute;
     z-index: 1;
-    top: calc(30% + 96px);
+    top: calc(20% + 96px);
     left: 50%;
     transform: translate(-50%, 0);
 
@@ -119,43 +96,10 @@ const HeroText = styled.div`
 
     font-size: 3rem;
     font-weight: ${props => props.thin ? 100 : 700};
-
-    opacity: 0;
-    animation: ${FadeInAnimation} 1000ms forwards;
-`
-
-const AnimatedButton = styled.div`
-    width: 200px;
-    z-index: 100;
-    padding: 12px 0;
-    margin-top: 32px;
-
-    color: white;
-    text-align: center;
-    cursor: pointer;
-    
-    border: 2px solid white;
-    border-radius: 8px;
-
-    font-weight: 500;
-
-    background-image: linear-gradient(to right, white 50%, transparent 50%);
-    background-position: 100% 0%;
-    background-size: 200% 100%;
-    transition: 500ms;
-
-    opacity: 0;
-    animation: ${FadeInAnimation} 1000ms forwards;
-    animation-delay: 2000ms;
-    &:hover {
-        color: black;
-        background-position: 0% 50%;
-    }
 `
 
 const Heading = styled.h1`
     color: white;
-
     font-size: 2rem;
 `
 const Temp = styled.p`
@@ -163,33 +107,103 @@ const Temp = styled.p`
 `
 
 const LandingPage = () => {
-    const ref = useRef();
+    useEffect(() => {
+        let moonAppearAnimation = anime({
+            targets: '.moonWrapper',
+            translateX: ['-50%', '-50%'],
+            rotate: [250, 360],
+            duration: 3000,
+            easing: 'easeOutExpo',
+        })
+        let moonGrowAnimation = anime({
+            targets: '.moon',
+            width: [32, 96],
+            height: [32, 96],
+            duration: 3000,
+            easing: 'easeOutExpo',
+        })
+
+        anime.timeline({
+            duration: 2000,
+            easing: 'easeOutExpo',
+        }).add({
+            targets: '.heroText',
+            opacity: [0, 1],
+        })
+        .add({
+            targets: '.learnMoreButton',
+            opacity: [0, 1],
+        })
+
+        const handleScroll = event => {
+            moonAppearAnimation.pause();
+            moonGrowAnimation.pause();
+            anime({
+                targets: '.moonWrapper',
+                rotate: 360,
+                translateX: 0,
+                translateY: 0,
+                top: 16,
+                left: 64,
+                duration: 1000,
+                easing: 'easeOutExpo',
+            })
+            anime({
+                targets: '.moon',
+                width: '32px',
+                height: '32px',
+                duration: 1000,
+                easing: 'easeOutExpo',
+            })
+            anime({
+                targets: '.headerHeading',
+                marginLeft: 48,
+                duration: 1000,
+                easing: 'easeOutExpo',
+            })
+
+            document.getElementById('appContainer').removeEventListener('scroll', handleScroll);
+        }
+
+        document.getElementById('appContainer').addEventListener('scroll', handleScroll);
+    }, []);
     
     return (
         <>
+            <LandingNavBar/>
+
             <StarWrapper>
                 {STARS.map((props, index) => <Star key={index} {...props}/>)}
-                <MoonWrapper>
-                    <MoonImage/>
-                </MoonWrapper>
             </StarWrapper>
 
-            <HeroContainer>
-                <HeroText thin={true}>
+            <MoonWrapper className='moonWrapper'>
+                <MoonImage className='moon'/>
+            </MoonWrapper>
+
+            <HeroContainer className='heroContainer'>
+                <HeroText className='heroText' thin={true}>
                     Note Taking
                 </HeroText>
-                <HeroText>
+                <HeroText className='heroText'>
                     Reimagined
                 </HeroText>
 
-                <AnimatedButton onClick={() => document.getElementById('anchor1').scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+                <SlidingButton
+                className={'learnMoreButton'}
+                width={'200px'}
+                padding={'12px 0'}
+                margin={'32px 0'}
+                color={'white'}
+                hoverColor={'black'}
+                onClick={() => document.getElementById('anchor').scrollIntoView({ behavior: 'smooth', block: 'start' })}>
                     Learn More
-                </AnimatedButton>
+                </SlidingButton>
             </HeroContainer>
 
             <MainColumn>
-                <Spacer height={'100vh'}/>
-                <Heading id='anchor1'>Fluidity</Heading>
+                <Spacer height={'calc(100vh - 80px)'}/>
+                <Spacer id="anchor" height={'80px'}/>
+                <Heading id="anchor2">Fluidity</Heading>
                 <Temp>
                     Gunwalls crack Jennys tea cup main sheet cutlass rigging belaying pin jury mast heave to Jack Ketch spanker. Parley Sail ho ho spanker jib bilge rat black spot Corsair spirits furl. Jib gangplank long boat dance the hempen jig bowsprit sheet lanyard Davy Jones' Locker cackle fruit bring a spring upon her cable. Hail-shot main sheet gaff crimp provost heave to mizzen doubloon grapple gabion. Capstan fire in the hole no prey, no pay league jolly boat bilge gunwalls cutlass pinnace hands. Spanish Main Sink me Sail ho Brethren of the Coast quarterdeck fore dance the hempen jig scourge of the seven seas wherry fathom. Haul wind coffer hands hogshead sheet rigging poop deck scurvy grog blossom clap of thunder. Swing the lead salmagundi weigh anchor Blimey Shiver me timbers shrouds heave down parley poop deck landlubber or just lubber. Aye topgallant bowsprit aft swing the lead mizzenmast barque capstan sheet knave. Chase Jack Tar Arr Spanish Main hardtack man-of-war parrel Admiral of the Black topgallant clap of thunder.
                 </Temp>

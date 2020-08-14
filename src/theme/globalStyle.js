@@ -18,6 +18,10 @@ export default createGlobalStyle`
     background-color: ${({ theme }) => theme.palette.background};
   }
 
+  a {
+    text-decoration: none;
+  }
+
   h1 {
     margin: 0;
     padding: 0;
