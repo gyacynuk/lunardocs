@@ -109,16 +109,14 @@ const Temp = styled.p`
 
 const LandingPage = () => {
     const [scrollAtTop, setScrollAtTop] = useState(true)
-    const [state, setState] = useState({});
+    const [state, setState] = useState([]);
     useEffect(() => {
-        state.moonToNav && state.moonToNav.pause();
-        state.moonShrink && state.moonShrink.pause();
-        state.navMove && state.navMove.pause();
+        state.forEach(animation => animation.pause())
 
         if (!scrollAtTop) {
-            const animations = {
-                ...state,
-                moonToNav: anime({
+            const animations = [
+                // Moon move to navbar
+                anime({
                     targets: '.moonWrapper',
                     rotate: 360,
                     translateX: '0%',
@@ -130,26 +128,28 @@ const LandingPage = () => {
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),
-                moonShrink: anime({
+                // Moon shrink
+                anime({
                     targets: '.moon',
                     width: '32px',
                     height: '32px',
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),
-                navMove: anime({
+                // Header text shift
+                anime({
                     targets: '.headerHeading',
                     marginLeft: '48px',
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),
-            }
+            ]
 
             setState(animations)
         } else {
-            const animations = {
-                ...state,
-                moonToNav: anime({
+            const animations = [
+                // Moon move to center
+                anime({
                     targets: '.moonWrapper',
                     translateX: '-50%',
                     translateY: '0%',
@@ -160,20 +160,22 @@ const LandingPage = () => {
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),
-                moonShrink: anime({
+                // Moon grow
+                anime({
                     targets: '.moon',
                     width: '96px',
                     height: '96px',
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),
-                navMove: anime({
+                // Header text shift
+                anime({
                     targets: '.headerHeading',
                     marginLeft: '0px',
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),
-            }
+            ]
 
             setState(animations)
         }
