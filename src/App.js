@@ -55,7 +55,7 @@ const App = () => {
         <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
             <GlobalStyle/>
             <Router>
-                <AppContainer>
+                <AppContainer id='appContainer'>
                     <Switch>
                         <Route path="/" exact component={LandingPage}/>
                         <Route path="/login" exact component={LoginPage}/>
