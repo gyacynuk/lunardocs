@@ -7,6 +7,7 @@ import Spacer from '../../components/spacer';
 import LandingNavBar from './landing-nav-bar';
 import SlidingButton from '../../components/sliding-button';
 import anime from 'animejs'
+import { isMobileJs} from '../../theme/breakpoint'
 
 const randXPos = () => Math.floor(Math.random() * 98) + 1
 const randYPos = () => Math.floor(Math.random() * 90) + 1
@@ -50,6 +51,10 @@ const MoonWrapper = styled.div`
     overflow: visible;
     transform-origin: bottom center;
 
+    ${({ theme }) => theme.isMobile`
+        marigin-left: -24px;
+    `}
+
     pointer-events: none;
     will-change: transform;
     will-change: left, top;
@@ -57,6 +62,10 @@ const MoonWrapper = styled.div`
 const MoonImage = styled(MoonSVG)`
     border-radius: 50%;
     box-shadow: 0 0 12px #EBEFF7AA;
+
+    ${({ theme }) => theme.isMobile`
+        margin-left: -40px;
+    `}
 
     will-change: width, height;
 `
@@ -67,9 +76,9 @@ const MainColumn = styled.div`
     left: 0;
     width: 100%; 
 
-    padding: 80px 80px;
+    padding: 64px;
     ${({ theme }) => theme.isMobile`
-        padding: 5%;
+        padding: 24px;
     `}
 
     display: block;
@@ -133,6 +142,7 @@ const LandingPage = () => {
                     targets: '.moon',
                     width: '32px',
                     height: '32px',
+                    marginLeft: isMobileJs.matches ? '-40px' : '0px',
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),
@@ -165,6 +175,7 @@ const LandingPage = () => {
                     targets: '.moon',
                     width: '96px',
                     height: '96px',
+                    marginLeft: '0px',
                     duration: 1000,
                     easing: 'easeOutExpo',
                 }),

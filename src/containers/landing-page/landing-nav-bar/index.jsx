@@ -12,7 +12,11 @@ const Container = styled.div`
 
     width: 100%;
     height: 64px;
+
     padding: 0 64px;
+    ${({ theme }) => theme.isMobile`
+        padding: 0 24px;
+    `}
     
     background-color: black;
     color: white;
@@ -28,7 +32,10 @@ const Group = styled.div`
 `
 
 const Heading = styled.h1`
-    font-weight: 700;
+    font-family: ${({ theme }) => theme.typography.editor.h2.fontFamily};
+    font-weight: ${({ theme }) => theme.typography.editor.h2.fontWeight};
+    font-size: ${({ theme }) => theme.typography.editor.h2.fontSize};
+    line-height: ${({ theme }) => theme.typography.editor.h2.lineHeight};
 `
 
 const DesktopOnlySlidingButton = styled(SlidingButton)`
@@ -38,7 +45,7 @@ const DesktopOnlySlidingButton = styled(SlidingButton)`
 `
 
 const Button = styled.div`
-    width: 120px;
+    width: 100px;
     padding: 8px 0;
     margin-left: 16px;
 
@@ -51,7 +58,7 @@ const Button = styled.div`
     border-radius: 8px;
     background-color: ${props => props.filled ? 'white' : `transparent`};
 
-    font-weight: 500;
+    font-weight: 400;
 
     ${({ theme }) => theme.isMobile`
         display:none
@@ -67,10 +74,11 @@ const LandingNavBar = (props) => {
             <Group>
                 <Link to='/login'>
                     <DesktopOnlySlidingButton
-                    width={'120px'}
+                    width={'100px'}
                     padding={'8px 0'}
                     color={'white'}
-                    hoverColor={'black'}>
+                    hoverColor={'black'}
+                    fontWeight={'400'}>
                         Login
                     </DesktopOnlySlidingButton>
                 </Link>

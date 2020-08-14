@@ -21,7 +21,7 @@ const LoadingBar = styled.div`
     margin: 0 4px;
     border-radius: 6px;
 
-    background-color: ${({ theme }) => (!!theme && !!theme.palette) ? theme.palette.text.heavy : '#222'};
+    background-color: ${({ theme }) => (!!theme && !!theme.palette) ? theme.palette.text.heavy : '#bcbcbc'};
     animation: ${LoadingAnimation} 1200ms infinite;
 `
 

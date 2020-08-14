@@ -16,6 +16,7 @@ const AnimatedButton = styled.div`
     border-radius: 8px;
 
     font-weight: ${props => props.fontWeight};
+    font-size: ${props => props.fontWeight};
 
     background-image: linear-gradient(to right, ${props => props.color} 50%, transparent 50%);
     background-position: 100% 0%;
@@ -45,6 +46,7 @@ SlidingButton.propTypes = {
     color: PropTypes.string,
     hoverColor: PropTypes.string,
     fontWeight: PropTypes.string,
+    fontSize: PropTypes.string,
 };
 
 SlidingButton.defaultProps = {
@@ -56,6 +58,7 @@ SlidingButton.defaultProps = {
     color: 'white',
     hoverColor: 'black',
     fontWeight: '500',
+    fontSize: '1rem',
 };
 
 export default SlidingButton;
