@@ -45,8 +45,9 @@ const MoonWrapper = styled.div`
     top: 20%;
     left: 50%;
     height: 80%;
-    z-index: 151;
 
+    z-index: 151;
+    overflow: visible;
     transform-origin: bottom center;
 
     pointer-events: none;
@@ -178,7 +179,7 @@ const LandingPage = () => {
         }
         
     }, [scrollAtTop]);
-    
+
     useEffect(() => {
         let moonAppearAnimation = anime({
             targets: '.moonWrapper',
