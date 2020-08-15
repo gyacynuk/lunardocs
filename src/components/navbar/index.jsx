@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { withRouter } from 'react-router-dom'
+import { useDispatch } from 'react-redux';
+import { signOutUser, fetchUserAsync } from '../../store/actions'
+
 
 import { ReactComponent as UserSVG } from '../../assets/icons/user.svg'
 import { ReactComponent as LightBulbSVG } from '../../assets/icons/lightbulb.svg'
@@ -38,7 +42,8 @@ export const NavBarRow = styled.div`
     justify-content: space-between;
 `
 
-const NavBar = () => {
+const NavBar = ({ history }) => {
+    const dispatch = useDispatch();
     return (
         <NavBarRow>
             <div>
@@ -47,7 +52,7 @@ const NavBar = () => {
             </div>
             <div>
                 <ThemeToggleButton/>
-                <UserIcon/>
+                <UserIcon onClick={() => dispatch(signOutUser(history))}/>
             </div>
         </NavBarRow>
     );
@@ -55,4 +60,4 @@ const NavBar = () => {
 
 NavBar.propTypes = {};
 
-export default NavBar;
+export default withRouter(NavBar);

@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import firebase from 'firebase';
 
 import { getTheme } from './store/selectors';
-import { lightTheme, darkTheme } from './theme';
+import { lightTheme, darkTheme, landingTheme } from './theme';
 import GlobalStyle from './theme/globalStyle';
 import NavBar from './components/navbar';
 import DocumentBrowser from './containers/document-browser';
@@ -14,19 +14,8 @@ import LandingPage from './containers/landing-page';
 import LoginPage from './containers/login-page';
 import './App.css'
 import EditorNavBar from './containers/editor/editor-nav-bar';
-import { setAuthUser } from './store/actions';
+import { setAuthUser, fetchUserAsync } from './store/actions';
 import PrivateRoute from './components/private-route';
-
-firebase.initializeApp({
-    appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    apiKey: process.env.REACT_APP_FIREBASE_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    databaseURL: process.env.REACT_APP_FIREBASE_DATABASE,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_FIREBASE_SENDER_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
-})
 
 const AppContainer = styled.div`
     position: fixed;
@@ -44,15 +33,23 @@ const AppContainer = styled.div`
 const App = () => {
     const dispatch = useDispatch();
     const theme = useSelector(getTheme);
+    const themeMap = {
+        'light': lightTheme,
+        'dark': darkTheme,
+        'landing': landingTheme
+    }
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                dispatch(fetchUserAsync(user.uid))
+            }
             dispatch(setAuthUser(user))
         });
     }, [dispatch]);
     
     return (
-        <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+        <ThemeProvider theme={themeMap[theme]}>
             <GlobalStyle/>
             <Router>
                 <AppContainer id='appContainer'>

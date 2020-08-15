@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types';
 import styled, { keyframes } from 'styled-components';
 
@@ -8,6 +9,7 @@ import LandingNavBar from './landing-nav-bar';
 import SlidingButton from '../../components/sliding-button';
 import anime from 'animejs'
 import { isMobileJs} from '../../theme/breakpoint'
+import { setTheme } from '../../store/actions';
 
 const randXPos = () => Math.floor(Math.random() * 98) + 1
 const randYPos = () => Math.floor(Math.random() * 90) + 1
@@ -117,8 +119,10 @@ const Temp = styled.p`
 `
 
 const LandingPage = () => {
+    const dispatch = useDispatch();
     const [scrollAtTop, setScrollAtTop] = useState(true)
     const [state, setState] = useState([]);
+
     useEffect(() => {
         state.forEach(animation => animation.pause())
 
@@ -194,6 +198,7 @@ const LandingPage = () => {
     }, [scrollAtTop]);
 
     useEffect(() => {
+        dispatch(setTheme('landing'))
         let moonAppearAnimation = anime({
             targets: '.moonWrapper',
             translateX: ['-50%', '-50%'],
@@ -208,15 +213,13 @@ const LandingPage = () => {
             duration: 3000,
             easing: 'easeOutExpo',
         })
-
-        anime.timeline({
+        let heroTextFadeInAnimation = anime.timeline({
             duration: 2000,
             easing: 'easeOutExpo',
         }).add({
             targets: '.heroText',
             opacity: [0, 1],
-        })
-        .add({
+        }).add({
             targets: '.learnMoreButton',
             opacity: [0, 1],
         })

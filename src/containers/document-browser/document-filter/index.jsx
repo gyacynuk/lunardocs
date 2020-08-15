@@ -55,22 +55,20 @@ const DocumentFilter = () => {
                 Filter
             </Label>
             <InnerContainer>
-                {
-                    [...Array(5)].map(e => (<><Dot data-tip data-for="dot1" color="red"/>
-                    <ReactTooltip id="dot1" place="bottom" effect="solid">
-                        Computer Science
-                    </ReactTooltip>
-        
-                    <Dot data-tip data-for="dot2" color="violet"/>
-                    <ReactTooltip id="dot2" place="bottom" effect="solid">
-                        Math
-                    </ReactTooltip>
-        
-                    <Dot data-tip data-for="dot3" color="lightBlue"/>
-                    <ReactTooltip id="dot3" place="bottom" effect="solid">
-                        French
-                    </ReactTooltip></>))
-                }
+                <Dot data-tip data-for="dot1" color="red"/>
+                <ReactTooltip id="dot1" place="bottom" effect="solid">
+                    Computer Science
+                </ReactTooltip>
+    
+                <Dot data-tip data-for="dot2" color="violet"/>
+                <ReactTooltip id="dot2" place="bottom" effect="solid">
+                    Math
+                </ReactTooltip>
+    
+                <Dot data-tip data-for="dot3" color="lightBlue"/>
+                <ReactTooltip id="dot3" place="bottom" effect="solid">
+                    French
+                </ReactTooltip>
             </InnerContainer>
             
         </OuterContainer>

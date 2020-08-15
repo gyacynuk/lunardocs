@@ -1,26 +1,19 @@
-import { TOGGLE_DISPLAY_MODE } from "../actionTypes";
+import { TOGGLE_DISPLAY_MODE, SET_THEME } from "../actionTypes";
 
 const LIGHT_THEME = 'light';
 const DARK_THEME = 'dark';
-
-const oppositeTheme = (theme) => {
-    if (theme === LIGHT_THEME) {
-        return DARK_THEME;
-    }
-    return LIGHT_THEME;
-}
+const LANDING_THEME = 'landing';
 
 const initialState = {
-    theme: DARK_THEME
+    theme: LANDING_THEME
 };
 
 export default (state = initialState, action) => {
     switch(action.type) {
-        case TOGGLE_DISPLAY_MODE: {
-            const { theme } = state
+        case SET_THEME: {
             return {
                 ...state,
-                theme: oppositeTheme(theme),
+                theme: action.payload.theme,
             }
         }
         default:

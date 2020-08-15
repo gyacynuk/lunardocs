@@ -1,7 +1,15 @@
 // Auth
 export const SET_AUTH_USER = 'SET_AUTH_USER'
 
+// User
+export const FETCH_USER_ASYNC = 'FETCH_USER_ASYNC'
+export const SIGN_OUT_USER = 'SIGN_OUT_USER'
+
+export const SET_USER = 'SET_USER'
+export const SET_USER_PREFERRED_THEME = 'SET_USER_PREFERRED_THEME'
+
 // Themeing and display
+export const SET_THEME = 'SET_THEME';
 export const TOGGLE_DISPLAY_MODE = 'TOGGLE_DISPLAY_MODE';
 
 // Editor
