@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types';
-import styled, { keyframes } from 'styled-components';
+import { useDispatch } from 'react-redux';
+import anime from 'animejs';
+import styled from 'styled-components';
 
-import { ReactComponent as MoonSVG } from '../../assets/images/moon.svg'
+import { ReactComponent as MoonSVG } from '../../assets/images/moon.svg';
 import Spacer from '../../components/spacer';
 import LandingNavBar from './landing-nav-bar';
 import SlidingButton from '../../components/sliding-button';
-import anime from 'animejs'
-import { isMobileJs} from '../../theme/breakpoint'
+import { isMobileJs} from '../../theme/breakpoint';
 import { setTheme } from '../../store/actions';
+import { fire } from '../../api';
 
 const randXPos = () => Math.floor(Math.random() * 98) + 1
 const randYPos = () => Math.floor(Math.random() * 90) + 1
@@ -199,6 +199,9 @@ const LandingPage = () => {
 
     useEffect(() => {
         dispatch(setTheme('landing'))
+
+        fire.analytics().logEvent('landing_page_view');
+
         let moonAppearAnimation = anime({
             targets: '.moonWrapper',
             translateX: ['-50%', '-50%'],
