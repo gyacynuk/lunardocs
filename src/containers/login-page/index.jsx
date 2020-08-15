@@ -18,20 +18,21 @@ const LoginPage = ({ history }) => {
             firebase.auth.FacebookAuthProvider.PROVIDER_ID,
             firebase.auth.EmailAuthProvider.PROVIDER_ID
         ],
-        signInSuccessUrl: '/documents',
+        signInSuccessUrl: '/documents'
     }
 
     useEffect(() => {
-        // Select the node that will be observed for mutations
-        const targetNode = document.getRootNode();
+        // Listen for user sign in
+        fire.auth().onAuthStateChanged(user => {
+            // Redirect automatically if user is already signed in
+            if (user) {
+                history.push('/documents')
+            }
+        })
 
-        // Options for the observer (which mutations to observe)
-        const config = { attributes: false, childList: true, subtree: true };
-
-        // Callback function to execute when mutations are observed
+        // Callback function to replace FirebaseAuthUI login loader with custom loader
         const callback = function(mutationsList, observer) {
-            // Use traditional 'for loops' for IE 11
-            for(let mutation of mutationsList) {
+            for (let mutation of mutationsList) {
                 if (mutation.type === 'childList' && mutation.target.id === 'firebaseui_container') {
                     ReactDOM.render(
                         <PageLoadingAnimation/>,
@@ -43,9 +44,7 @@ const LoginPage = ({ history }) => {
 
         // Create an observer instance linked to the callback function
         const observer = new MutationObserver(callback);
-
-        // Start observing the target node for configured mutations
-        observer.observe(targetNode, config);
+        observer.observe(document.getRootNode(), { attributes: false, childList: true, subtree: true });
 
         return () => {
             observer.disconnect();

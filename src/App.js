@@ -44,7 +44,6 @@ const App = () => {
             if (user) {
                 dispatch(fetchUserAsync(user.uid))
             }
-            dispatch(setAuthUser(user))
         });
     }, [dispatch]);
     
