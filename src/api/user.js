@@ -1,6 +1,6 @@
 import { fire } from '../api'
 
-const USER_COLLECTION = 'users'
+export const USER_COLLECTION = 'users'
 
 /**
  * 
@@ -28,7 +28,6 @@ export const fetchUser = async (db, userId) => {
  * @param {*} userData
  */
 export const upsertUser = async (db, userData) => {
-    console.log('upserting')
     const currentUserUuid = fire.auth().currentUser.uid
     await db.collection(USER_COLLECTION).doc(currentUserUuid).set(
         userData,
@@ -37,6 +36,6 @@ export const upsertUser = async (db, userData) => {
 }
 
 export const signOutUser = async (history) => {
-    history.push('/')
     await fire.auth().signOut();
+    history.push('/')
 }

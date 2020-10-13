@@ -59,7 +59,7 @@ const App = () => {
                             <NavBar/>
                             <DocumentBrowser/>
                         </PrivateRoute>
-                        <PrivateRoute path="/documents/edit/:id" exact>
+                        <PrivateRoute path="/documents/edit/:documentId" exact>
                             <EditorNavBar/>
                             <Editor/>
                         </PrivateRoute>
