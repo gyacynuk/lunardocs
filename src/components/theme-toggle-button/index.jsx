@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -27,9 +28,12 @@ const ThemeToggleButton = () => {
     const theme = useSelector(getTheme);
     const dispatch = useDispatch();
     
-    return (
-        <MoonIcon onClick={() => dispatch(setUserPreferredTheme(oppositeTheme(theme)))}/>
-    );
+    return (<>
+        <MoonIcon data-tip data-for="theme" onClick={() => dispatch(setUserPreferredTheme(oppositeTheme(theme)))}/>
+        <ReactTooltip id="theme" place="bottom" effect="solid">
+            Toggle Theme
+        </ReactTooltip>
+    </>);
 };
 
 ThemeToggleButton.propTypes = {};
