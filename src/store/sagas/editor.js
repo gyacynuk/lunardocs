@@ -1,7 +1,7 @@
 import { put, call, takeLatest, delay, select } from 'redux-saga/effects'
 import { EDITOR_SAVE_DELAY_MILLIS } from '../../api/constants'
 import { setActiveDocumentId, setActiveDocumentTitle, setActiveDocumentValue, closeDocument, saveDocumentValueAsync } from '../actions'
-import { EDITOR_SAVE_DOCUMENT, EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT } from '../actionTypes'
+import { EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT } from '../actionTypes'
 import Api, { db } from '../../api'
 import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue } from '../selectors'
 
@@ -44,24 +44,6 @@ function* saveActiveDocumentAndClose(action) {
 export function* watchSaveActiveDocumentAndClose() {
     // Will cancel current running updateDocument task
     yield takeLatest(EDITOR_SAVE_AND_CLOSE_DOCUMENT, saveActiveDocumentAndClose);
-}
-
-function* saveDocument(action) {
-    // Immidiately update the local variables
-    yield (put(setActiveDocumentId(action.payload.id)));
-    if (action.payload.title) {
-        yield (put(setActiveDocumentTitle(action.payload.title)));
-    }
-    if (action.payload.value) {
-        yield (put(setActiveDocumentValue(action.payload.value)));
-    }
-
-    // Update document in database
-    yield call(Api.saveDocument, db, action.payload)
-}
-export function* watchSaveDocument() {
-    // Will cancel current running updateDocument task
-    yield takeLatest(EDITOR_SAVE_DOCUMENT, saveDocument);
 }
 
 function* saveDocumentAsync(action) {

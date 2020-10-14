@@ -75,10 +75,6 @@ export const saveAndCloseDocument = () => ({
 	type: EDITOR_SAVE_AND_CLOSE_DOCUMENT,
 	payload: {}
 })
-export const saveDocumentValue = documentData => ({
-	type: EDITOR_SAVE_DOCUMENT,
-	payload: documentData
-})
 export const saveDocumentValueAsync = documentData => ({
 	type: EDITOR_SAVE_DOCUMENT_ASYNC,
 	payload: documentData

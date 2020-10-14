@@ -10,7 +10,7 @@ import { ReactComponent as BackArrowSVG } from '../../../assets/icons/back-arrow
 import { ReactComponent as MenuSVG } from '../../../assets/icons/menu-dots.svg'
 import { useDispatch, useSelector } from 'react-redux';
 import { getActiveDocumentTitle } from '../../../store/selectors';
-import { saveAndCloseDocument, saveDocumentValue, setActiveDocumentTitle } from '../../../store/actions';
+import { saveAndCloseDocument, saveDocumentValueAsync, setActiveDocumentTitle } from '../../../store/actions';
 
 
 const SubRow = styled.div`
@@ -60,10 +60,11 @@ const EditorNavBar = ({ documentId }) => {
                 <DocumentLabel
                 value={documentTitle}
                 onChange={e => dispatch(setActiveDocumentTitle(e.target.value))}
-                onBlur={(e) => dispatch(saveDocumentValue({
+                onBlur={(e) => dispatch(saveDocumentValueAsync({
                     id: documentId,
                     title: e.target.value,
-                    timestamp: + new Date()
+                    timestamp: + new Date(),
+                    delay: 0,
                 }))}/>
             </SubRow>
 

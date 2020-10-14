@@ -1,6 +1,6 @@
 import { all } from 'redux-saga/effects'
 import { watchFetchUserAsync, watchSignOutUser, watchSetUserPreferredTheme } from './user'
-import { watchSaveDocument, watchSaveDocumentAsync, watchOpenDocument, watchSaveActiveDocumentAndClose } from './editor'
+import { watchSaveDocumentAsync, watchOpenDocument, watchSaveActiveDocumentAndClose } from './editor'
 import { watchFetchDocumentsAsync } from './documents'
 
 export default function* rootSaga() {
@@ -8,7 +8,6 @@ export default function* rootSaga() {
         watchFetchUserAsync(),
         watchSignOutUser(),
         watchSetUserPreferredTheme(),
-        watchSaveDocument(),
         watchSaveDocumentAsync(),
         watchFetchDocumentsAsync(),
         watchOpenDocument(),
