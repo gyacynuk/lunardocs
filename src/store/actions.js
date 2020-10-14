@@ -1,4 +1,4 @@
-import { TOGGLE_TODO, SET_FILTER, TOGGLE_DISPLAY_MODE, EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET,EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX, SET_AUTH_USER, FETCH_USER_ASYNC, SIGN_OUT_USER, SET_THEME, SET_USER, SET_USER_PREFERRED_THEME } from "./actionTypes";
+import { TOGGLE_TODO, SET_FILTER, TOGGLE_DISPLAY_MODE, EDITOR_SAVE_DOCUMENT, EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_SET_ACTIVE_DOCUMENT_ID, EDITOR_SET_ACTIVE_DOCUMENT_TITLE, EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET,EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX, SET_AUTH_USER, FETCH_USER_ASYNC, SIGN_OUT_USER, SET_THEME, SET_USER, SET_USER_PREFERRED_THEME, FETCH_DOCUMENTS_ASYNC, SET_DOCUMENTS, SET_ACTIVE_DOCUMENT, EDITOR_OPEN_DOCUMENT, EDITOR_CLOSE_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT } from './actionTypes';
 
 // Auth
 export const setAuthUser = (value) => ({
@@ -46,7 +46,47 @@ export const setTheme = (theme) => ({
 });
 
 
+// Documents
+export const fetchDocumentsAsync = () => ({
+	type: FETCH_DOCUMENTS_ASYNC,
+	payload: {}
+})
+export const setDocuments = value => ({
+	type: SET_DOCUMENTS,
+	payload: value
+})
+export const setActiveDocument = value => ({
+	type: SET_ACTIVE_DOCUMENT,
+	payload: value
+})
+
+
+
 // Editor
+export const openDocument = documentId => ({
+	type: EDITOR_OPEN_DOCUMENT,
+	payload: documentId
+})
+export const closeDocument = () => ({
+	type: EDITOR_CLOSE_DOCUMENT,
+	payload: {}
+})
+export const saveAndCloseDocument = () => ({
+	type: EDITOR_SAVE_AND_CLOSE_DOCUMENT,
+	payload: {}
+})
+export const saveDocumentValueAsync = documentData => ({
+	type: EDITOR_SAVE_DOCUMENT_ASYNC,
+	payload: documentData
+})
+export const setActiveDocumentId = (value) => ({
+	type: EDITOR_SET_ACTIVE_DOCUMENT_ID,
+	payload: value
+})
+export const setActiveDocumentTitle = (value) => ({
+	type: EDITOR_SET_ACTIVE_DOCUMENT_TITLE,
+	payload: value
+})
 export const setActiveDocumentValue = (value) => ({
 	type: EDITOR_SET_ACTIVE_DOCUMENT_VALUE,
 	payload: value

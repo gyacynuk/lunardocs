@@ -1,8 +1,9 @@
-import { EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET, EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX } from "../actionTypes";
+import { EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET, EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX, EDITOR_SET_ACTIVE_DOCUMENT_TITLE, EDITOR_SET_ACTIVE_DOCUMENT_ID, EDITOR_CLOSE_DOCUMENT } from "../actionTypes";
 
 const initialState = {
     activeDocument: {
-        name: 'You shouldn\'t be seeing this, SNEAKY',
+        id: '',
+        title: '',
         value: [{
             type: 'paragraph',
             children: [{ text: '' }],
@@ -17,6 +18,24 @@ const initialState = {
 
 export default (state = initialState, action) => {
     switch(action.type) {
+        case EDITOR_SET_ACTIVE_DOCUMENT_ID: {
+            return {
+                ...state,
+                activeDocument: {
+                    ...state.activeDocument,
+                    id: action.payload
+                }
+            }
+        }
+        case EDITOR_SET_ACTIVE_DOCUMENT_TITLE: {
+            return {
+                ...state,
+                activeDocument: {
+                    ...state.activeDocument,
+                    title: action.payload
+                }
+            }
+        }
         case EDITOR_SET_ACTIVE_DOCUMENT_VALUE: {
             return {
                 ...state,
@@ -52,6 +71,9 @@ export default (state = initialState, action) => {
                     dropdownIndex: action.payload
                 }
             }
+        }
+        case EDITOR_CLOSE_DOCUMENT: {
+            return initialState;
         }
         default:
             return state;

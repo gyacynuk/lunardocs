@@ -8,7 +8,12 @@ export const getUser = store => store.user.user;
 // Themeing and display
 export const getTheme = store => store.display.theme;
 
+// Documents
+export const getDocuments = store => store.documents.documents;
+
 // Editor
+export const getActiveDocumentId = store => store.editor.activeDocument.id;
+export const getActiveDocumentTitle = store => store.editor.activeDocument.title;
 export const getActiveDocumentValue = store => store.editor.activeDocument.value;
 
 export const getShortcutTarget = store => store.editor.shortcut.target;

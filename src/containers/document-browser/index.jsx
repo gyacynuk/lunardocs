@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -8,6 +8,14 @@ import DocumentFilter from './document-filter';
 import SearchBar from './search-bar';
 import NewDocumentButton from './new-document-button';
 import ContentPane from '../../components/content-pane';
+import Api, { db } from '../../api';
+import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDocumentsAsync } from '../../store/actions';
+import { getActiveDocumentValue, getDocuments } from '../../store/selectors';
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
+
+
 
 const ScrollableContainer = styled.div`
     width: 100%;
@@ -17,34 +25,27 @@ const ScrollableContainer = styled.div`
 `
 
 const DocumentBrowser = () => {
+    const dispatch = useDispatch();
+    const documents = useSelector(getDocuments);
+
+    useEffect(() => {
+        console.log("fetching docs")
+        dispatch(fetchDocumentsAsync())
+    }, [])
+
     return (
         <ContentPane>
             <SearchBar/>
             <DocumentFilter/>
             <ScrollableContainer>
                 <NewDocumentButton/>
-                <Divider/>
-                <Document title="Astrial Designer Drugs" date="July 5th, 2020" subjectColor="red"/>
-                <Divider/>
-                <Document title="Salvia Letterpress" date="July 4th, 2020" subjectColor="violet"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
-                <Divider/>
-                <Document title="I'm Baby" date="July 4th, 2020" subjectColor="lightBlue"/>
+                {documents.map(doc =>
+                    (<React.Fragment key={doc.id} >
+                        <Divider/>
+                        <Link to={`/documents/edit/${doc.id}`}>
+                            <Document title={doc.title} date={moment(doc.timestamp).format('MMM Do YYYY, h:mm a')} subjectColor="red"/>
+                        </Link>
+                    </React.Fragment>))}
             </ScrollableContainer>
         </ContentPane>
     );

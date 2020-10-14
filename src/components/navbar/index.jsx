@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import { withRouter } from 'react-router-dom'
 import { useDispatch } from 'react-redux';
 import { signOutUser, fetchUserAsync } from '../../store/actions'
 
 
-import { ReactComponent as UserSVG } from '../../assets/icons/user.svg'
+import { ReactComponent as UserSVG } from '../../assets/icons/logout.svg'
 import { ReactComponent as LightBulbSVG } from '../../assets/icons/lightbulb.svg'
 import { ReactComponent as DocumentsSVG } from '../../assets/icons/documents.svg'
 import ThemeToggleButton from '../theme-toggle-button';
@@ -47,12 +48,16 @@ const NavBar = ({ history }) => {
     return (
         <NavBarRow>
             <div>
-                <DocumentsIcon/>
-                <LightBulbIcon/>
+                {/* <DocumentsIcon/>
+                <LightBulbIcon/> */}
             </div>
             <div>
                 <ThemeToggleButton/>
-                <UserIcon onClick={() => dispatch(signOutUser(history))}/>
+
+                <UserIcon data-tip data-for="logout" onClick={() => dispatch(signOutUser(history))}/>
+                <ReactTooltip id="logout" place="bottom" effect="solid">
+                    Logout
+                </ReactTooltip>
             </div>
         </NavBarRow>
     );

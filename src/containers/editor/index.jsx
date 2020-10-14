@@ -14,7 +14,7 @@ import Portal from '../../components/portal'
 import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header2Element, Header3Element } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
-import { setActiveDocumentValue, setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex } from "../../store/actions";
+import { setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex, saveDocumentValueAsync, openDocument } from "../../store/actions";
 import { isNodeEmptyAsideFromSelection, getCurrentPath, getParentPath } from './utils';
 import ToolBar from "./tool-bar";
 import ToolBarButton from "./tool-bar-button";
@@ -246,8 +246,13 @@ const setBlock = (editor, format) => {
     }
 }
 
-const TextEditor = props => {
+const TextEditor = ({ documentId, ...props }) => {
     const dispatch = useDispatch();
+
+    // Load in current document
+    useEffect(() => {
+        dispatch(openDocument(documentId))
+    }, [])
 
     // Create a Slate editor object that won't change across renders.
     const editor = useMemo(() => withCustomElements(withReact(withHistory(createEditor()))), []);
@@ -269,8 +274,6 @@ const TextEditor = props => {
         insertShortcut(editor, shortcut)
         dispatch(setShortcutTarget(null))
     }
-
-    console.log(documentValue)
 
     const onKeyDown = useCallback(
         event => {
@@ -350,7 +353,14 @@ const TextEditor = props => {
     }, [matchingShortcuts.length, editor, shortcutTarget, shortcutSearch, shortcutDropdownIndex])
 
     const onChange = value => {
-        dispatch(setActiveDocumentValue(value))
+        if (documentValue != value) {
+            dispatch(saveDocumentValueAsync({
+                id: documentId,
+                value: value,
+                timestamp: + new Date()
+            }))
+        }
+        
         const { selection } = editor
 
         if (selection && Range.isCollapsed(selection)) {

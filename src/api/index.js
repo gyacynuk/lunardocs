@@ -1,5 +1,7 @@
 import firebase from 'firebase'
 import { fetchUser, signOutUser, upsertUser } from './user'
+import { saveDocument } from './editor'
+import { fetchAllDocuments, fetchDocumentById } from './documents'
 
 export const fire = firebase.initializeApp({
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
@@ -16,5 +18,8 @@ export const db = fire.firestore();
 export default {
     fetchUser,
     signOutUser,
-    upsertUser
+    upsertUser,
+    saveDocument,
+    fetchAllDocuments,
+    fetchDocumentById,
 }
