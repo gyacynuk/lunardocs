@@ -1,14 +1,19 @@
 import { put, call, takeLatest, delay, select } from 'redux-saga/effects'
 import { EDITOR_SAVE_DELAY_MILLIS } from '../../api/constants'
-import { setActiveDocumentId, setActiveDocumentTitle, setActiveDocumentValue, closeDocument, saveDocumentValueAsync } from '../actions'
+import { setActiveDocumentId, setActiveDocumentTitle, setActiveDocumentValue, closeDocument, saveDocumentValueAsync, setLoading } from '../actions'
 import { EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT } from '../actionTypes'
 import Api, { db } from '../../api'
-import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue } from '../selectors'
+import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue, isActiveDocumentLoaded } from '../selectors'
 
 function* openDocument(action) {
+    const isDocumentAlreadyLoaded = yield select(isActiveDocumentLoaded);
+    if (isDocumentAlreadyLoaded) {
+        return;
+    }
+
+    yield put(setLoading(true))
     const id = action.payload; 
     const { title, value } = yield call(Api.fetchDocumentById, db, id);
-
     if (title == undefined || value == undefined) {
         // TODO Handle when load fails
         console.error('Failed to read document')
@@ -17,6 +22,7 @@ function* openDocument(action) {
         yield (put(setActiveDocumentTitle(title)));
         yield (put(setActiveDocumentValue(value)));
     }
+    yield put(setLoading(false))
 }
 export function* watchOpenDocument() {
     // Will cancel current running updateDocument task
