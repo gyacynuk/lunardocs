@@ -1,17 +1,20 @@
 import { call, put, delay, takeEvery, takeLatest } from 'redux-saga/effects'
 import Api, { db } from '../../api'
 import { FETCH_USER_ASYNC, SIGN_OUT_USER, SET_USER_PREFERRED_THEME } from '../actionTypes'
-import { setTheme, setUser } from '../actions'
+import { setLoading, setTheme, setUser } from '../actions'
 
 export function* fetchUserAsync(action) {
+    yield put(setLoading(true))
     try {
         const user = yield call(Api.fetchUser, db, action.payload.userId)
         yield put(setUser(user))
         yield put(setTheme(user.preferredTheme))
-     } catch (error) {
+    } catch (error) {
         // TODO: implement
         yield put({type: "FETCH_FAILED", error})
-     }
+    } finally {
+        yield put(setLoading(false))
+    }
 }
 export function* watchFetchUserAsync() {
     yield takeEvery(FETCH_USER_ASYNC, fetchUserAsync)

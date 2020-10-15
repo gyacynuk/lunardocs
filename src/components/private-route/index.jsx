@@ -2,11 +2,11 @@
 import React from "react";
 import { useSelector } from 'react-redux';
 import { Route, Redirect } from "react-router-dom";
-import { isUserPending, isUserSignedIn } from "../../store/selectors";
+import { isLoading, isUserSignedIn } from "../../store/selectors";
 import PageLoadingAnimation from "../page-loading-animation";
 
 const PrivateRoute = ({ component, children, ...props }) => {
-    const signInPending = useSelector(isUserPending);
+    const loading = useSelector(isLoading);
     const userSignedIn = useSelector(isUserSignedIn);
 
     // Extract the computed matched from the Route, and pass them as props to all children, or single child
@@ -22,7 +22,7 @@ const PrivateRoute = ({ component, children, ...props }) => {
     return (
         <Route {...props}>
             {
-                signInPending
+                loading
                     ? <PageLoadingAnimation/>
                     : userSignedIn
                         ? routeComponent
