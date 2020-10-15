@@ -5,7 +5,7 @@ import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import isHotkey, { toKeyName } from 'is-hotkey'
 
-import { createEditor, Editor, Transforms, Range, Text, Node, Path } from 'slate'
+import { createEditor, Editor, Transforms, Range } from 'slate'
 import { Slate, Editable, withReact, ReactEditor, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
 
@@ -15,7 +15,6 @@ import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
 import { setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex, saveDocumentValueAsync, openDocument } from "../../store/actions";
-import { isNodeEmptyAsideFromSelection, getCurrentPath, getParentPath } from './utils';
 import ToolBar from "./tool-bar";
 import ToolBarButton from "./tool-bar-button";
 import DropDown from "../../components/drop-down";
@@ -48,6 +47,7 @@ const HOTKEYS = {
 
 const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
 const SHORTCUTS = [
+    { name: 'bulleted-list', nodeProperties: { isInline: false, isVoid: false } },
     { name: 'code' },
     { name: 'codeblock', nodeProperties: { isInline: false, isVoid: false } },
     { name: 'header1', nodeProperties: { isInline: false, isVoid: false } },
@@ -56,6 +56,7 @@ const SHORTCUTS = [
     { name: 'image', nodeProperties: { isInline: false, isVoid: true } },
     { name: 'link', nodeProperties: { isInline: false, isVoid: false } },
     { name: 'list', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'numbered-list', nodeProperties: { isInline: false, isVoid: false } },
 ];
 const SHORTCUTS_MAP = SHORTCUTS.reduce((map, shortcut) => (map[shortcut.name] = shortcut, map), {});
 
@@ -127,76 +128,38 @@ const insertImage = (editor, url) => {
 
 const insertShortcut = (editor, shortcut) => {
     switch (shortcut) {
+        case 'bulleted-list': {
+            toggleBlock(editor, 'bulleted-list')
+            break
+        }
         case 'code': {
-            // Delete current selection (shortcut typed by user)
-            Transforms.delete(editor)
-
-            // Set mark to code
             toggleMark(editor, 'code');
             break
         }
         case 'codeblock': {
-            // If the current node is empty, then just wrap it
-            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
-                Transforms.setNodes(editor,
-                    { type: 'codeblock' }
-                )
-
-                // Delete current selection (shortcut typed by user)
-                Transforms.delete(editor)
-            }
-            else {
-                const codeblock = { type: 'codeblock', children: [{ text: '' }] }
-                Transforms.insertNodes(editor, codeblock)
-            }
+            toggleBlock(editor, 'codeblock')
             break
         }
         case 'header1': {
-            // If the current node is empty, then just wrap it
-            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
-                Transforms.setNodes(editor,
-                    { type: 'header1' }
-                )
-
-                // Delete current selection (shortcut typed by user)
-                Transforms.delete(editor)
-            } else {
-                const header = { type: 'header1', children: [{ text: '' }] }
-                Transforms.insertNodes(editor, header)
-            }
+            toggleBlock(editor, 'header1')
             break
         }
         case 'header2': {
-            // If the current node is empty, then just wrap it
-            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
-                Transforms.setNodes(editor,
-                    { type: 'header2' }
-                )
-
-                // Delete current selection (shortcut typed by user)
-                Transforms.delete(editor)
-            } else {
-                const header = { type: 'header2', children: [{ text: '' }] }
-                Transforms.insertNodes(editor, header)
-            }
+            toggleBlock(editor, 'header2')
             break
         }
         case 'header3': {
-            // If the current node is empty, then just wrap it
-            if (isNodeEmptyAsideFromSelection(editor, getCurrentPath(editor))) {
-                Transforms.setNodes(editor,
-                    { type: 'header3' }
-                )
-
-                // Delete current selection (shortcut typed by user)
-                Transforms.delete(editor)
-            } else {
-                const header = { type: 'header3', children: [{ text: '' }] }
-                Transforms.insertNodes(editor, header)
-            }
+            toggleBlock(editor, 'header3')
+            break
+        }
+        case 'numbered-list': {
+            toggleBlock(editor, 'numbered-list')
             break
         }
     }
+
+    // Delete current selection (shortcut typed by user)
+    Transforms.delete(editor)
 }
 
 const isMarkActive = (editor, format) => {
@@ -206,16 +169,22 @@ const isMarkActive = (editor, format) => {
 
 const toggleMark = (editor, format) => {
     const isActive = isMarkActive(editor, format)
-
-    console.log(`isActive: ${isActive}`)
   
     if (isActive) {
         Editor.removeMark(editor, format)
-        console.log('removed')
     } else {
         Editor.addMark(editor, format, true)
-        console.log('added')
     }
+}
+
+const isAnyListActive = editor => {
+    const [match] = Editor.nodes(editor, {
+        match: n => LIST_TYPES.includes(n.type),
+    })
+
+    Editor.nodes(editor)
+  
+    return !!match
 }
 
 const isBlockActive = (editor, format) => {
@@ -237,12 +206,22 @@ const setBlock = (editor, format) => {
     })
   
     Transforms.setNodes(editor, {
-        type: format
+        type: isList ? 'list-item' : format,
     })
   
     if (isList) {
         const block = { type: format, children: [] }
         Transforms.wrapNodes(editor, block)
+    }
+}
+
+const toggleBlock = (editor, format) => {
+    const isActive = isBlockActive(editor, format)
+
+    if (isActive) {
+        setBlock(editor, 'paragraph')
+    } else {
+        setBlock(editor, format)
     }
 }
 
@@ -318,24 +297,70 @@ const TextEditor = ({ documentId, ...props }) => {
             // Handle special logic
             switch (event.key) {
             case 'Enter': 
+                // Enter pressed WITH shift
                 if (event.shiftKey) {
-                    const [matchingCodeblock] = Editor.nodes(editor, {
-                        at: getCurrentPath(editor),
-                        match: n => n.type === 'codeblock',
-                    })
+                    // const [matchingCodeblock] = Editor.nodes(editor, {
+                    //     at: getCurrentPath(editor),
+                    //     match: n => n.type === 'codeblock',
+                    // })
                     
-                    if (!!matchingCodeblock) {
+                    // if (!!matchingCodeblock) {
+                    //     event.preventDefault();
+                    //     Editor.insertText(editor, '\r\n');
+                    //     break
+                    // }
+
+                    if (isAnyListActive(editor)) {
+                        event.preventDefault();
+                        // If cursor is at end of line, add a new list item below
+                        if (Editor.isEnd(editor, editor.selection.anchor, editor.selection.anchor.path)) {
+                            const listItem = { type: 'list-item', children: [{ text: '' }] }
+                            Transforms.insertNodes(editor, listItem)
+                        }
+                        // Otherwise split the current list item
+                        else {
+                            Transforms.splitNodes(editor)
+                        }
+                    }
+                    else if (isBlockActive(editor, 'codeblock')){
                         event.preventDefault();
                         Editor.insertText(editor, '\r\n');
-                        break
+                    }
+                }
+                // Enter pressed WITHOUT shift
+                else {
+                    if (!shortcutTarget) {
+                        event.preventDefault();
+
+                        if (isAnyListActive(editor)) {
+                            // If cursor is at end of line, add a new paragraph item below and unwrap it
+                            if (Editor.isEnd(editor, editor.selection.anchor, editor.selection.anchor.path)) {
+                                const paragraph = { type: 'paragraph', children: [{ text: '' }] }
+                                Transforms.insertNodes(editor, paragraph)
+                                Transforms.unwrapNodes(editor, {
+                                    match: n => LIST_TYPES.includes(n.type),
+                                    split: true,
+                                })
+                            }
+                            // Otherwise split the current list item, unwrap it, and set it as a paragraph
+                            else {
+                                Transforms.splitNodes(editor)
+                                Transforms.unwrapNodes(editor, {
+                                    match: n => LIST_TYPES.includes(n.type),
+                                    split: true,
+                                })
+                                Transforms.setNodes(editor, {
+                                    type: 'paragraph',
+                                })
+                            }
+                        }
+                        else {
+                            const paragraph = { type: 'paragraph', children: [{ text: '' }] }
+                            Transforms.insertNodes(editor, paragraph)
+                        }
                     }
                 }
 
-                if (!shortcutTarget) {
-                    event.preventDefault();
-                    const paragraph = { type: 'paragraph', children: [{ text: '' }] }
-                    Transforms.insertNodes(editor, paragraph)
-                }
                 break
             }
         },
@@ -389,6 +414,8 @@ const TextEditor = ({ documentId, ...props }) => {
 
     const renderElement = useCallback(props => {
         switch (props.element.type) {
+            case 'bulleted-list':
+                return <ul {...props.attributes}>{props.children}</ul>
             case 'codeblock':
                 return <CodeElement {...props} />
             case 'header1':
@@ -399,6 +426,10 @@ const TextEditor = ({ documentId, ...props }) => {
                 return <Header3Element {...props} />
             case 'image':
                 return <ImageElement {...props} />
+            case 'list-item':
+                return <li {...props.attributes}>{props.children}</li>
+            case 'numbered-list':
+                return <ol {...props.attributes}>{props.children}</ol>
             case 'paragraph':
             default:
                 return <DefaultElement {...props} />
@@ -408,8 +439,6 @@ const TextEditor = ({ documentId, ...props }) => {
     const renderLeaf = useCallback(props => {
         return <Leaf {...props} />
     }, []);
-
-    const currentBlockType = BLOCK_TYPES.find(blockType => isBlockActive(editor, blockType.type))
 
     return (
         <ContentPane>
@@ -431,6 +460,12 @@ const TextEditor = ({ documentId, ...props }) => {
                 <MarkButton format={'code'}>
                     <code>{'<>'}</code>
                 </MarkButton>
+                <BlockButton format={'bulleted-list'}>
+                    <code>{'•'}</code>
+                </BlockButton>
+                <BlockButton format={'numbered-list'}>
+                    <code>{'1.'}</code>
+                </BlockButton>
             </ToolBar>
             <StyledEditable
                 autoFocus
@@ -457,6 +492,15 @@ const MarkButton = ({ format, children }) => {
     const editor = useSlate();
     return (
         <ToolBarButton active={isMarkActive(editor, format)} onMouseDown={() => toggleMark(editor, format)}>
+            {children}
+        </ToolBarButton>
+    )
+}
+
+const BlockButton = ({ format, children }) => {
+    const editor = useSlate();
+    return (
+        <ToolBarButton active={isBlockActive(editor, format)} onMouseDown={() => toggleBlock(editor, format)}>
             {children}
         </ToolBarButton>
     )
