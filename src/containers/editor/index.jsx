@@ -299,17 +299,6 @@ const TextEditor = ({ documentId, ...props }) => {
             case 'Enter': 
                 // Enter pressed WITH shift
                 if (event.shiftKey) {
-                    // const [matchingCodeblock] = Editor.nodes(editor, {
-                    //     at: getCurrentPath(editor),
-                    //     match: n => n.type === 'codeblock',
-                    // })
-                    
-                    // if (!!matchingCodeblock) {
-                    //     event.preventDefault();
-                    //     Editor.insertText(editor, '\r\n');
-                    //     break
-                    // }
-
                     if (isAnyListActive(editor)) {
                         event.preventDefault();
                         // If cursor is at end of line, add a new list item below
@@ -381,8 +370,7 @@ const TextEditor = ({ documentId, ...props }) => {
         if (documentValue != value) {
             dispatch(saveDocumentValueAsync({
                 id: documentId,
-                value: value,
-                timestamp: + new Date()
+                value: value
             }))
         }
         

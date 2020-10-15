@@ -12,6 +12,10 @@ export const USER_DOCUMENT_COLLECTION = 'documents'
  */
 export const saveDocument = async (db, documentData) => {
     console.log('saveDocument')
+
+    // Add timestamp to document data
+    documentData = { ...documentData, timestamp: + new Date() }
+
     try {
         const currentUserUuid = fire.auth().currentUser.uid
         await db
