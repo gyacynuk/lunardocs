@@ -1,4 +1,5 @@
-import { VISIBILITY_FILTERS } from "./constants";
+// Global
+export const isLoading = store => store.global.loading;
 
 // User
 export const isUserSignedIn = store => !!store.user.user;

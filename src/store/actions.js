@@ -1,7 +1,13 @@
-import { TOGGLE_DISPLAY_MODE, EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_SET_ACTIVE_DOCUMENT_ID, EDITOR_SET_ACTIVE_DOCUMENT_TITLE, EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET,EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX, SET_AUTH_USER, FETCH_USER_ASYNC, SIGN_OUT_USER, SET_THEME, SET_USER, SET_USER_PREFERRED_THEME, FETCH_DOCUMENTS_ASYNC, SET_DOCUMENTS, SET_ACTIVE_DOCUMENT, EDITOR_OPEN_DOCUMENT, EDITOR_CLOSE_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT } from './actionTypes';
+import { TOGGLE_DISPLAY_MODE, EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_SET_ACTIVE_DOCUMENT_ID, EDITOR_SET_ACTIVE_DOCUMENT_TITLE, EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET,EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX, SET_AUTH_USER, FETCH_USER_ASYNC, SIGN_OUT_USER, SET_THEME, SET_USER, SET_USER_PREFERRED_THEME, FETCH_DOCUMENTS_ASYNC, SET_DOCUMENTS, SET_ACTIVE_DOCUMENT, EDITOR_OPEN_DOCUMENT, EDITOR_CLOSE_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT, SET_LOADING } from './actionTypes';
+
+// Global
+export const setLoading = value => ({
+	type: SET_LOADING,
+	payload: value
+})
 
 // Auth
-export const setAuthUser = (value) => ({
+export const setAuthUser = value => ({
 	type: SET_AUTH_USER,
 	payload: value
 })
@@ -38,7 +44,7 @@ export const toggleDisplayMode = () => ({
 	type: TOGGLE_DISPLAY_MODE,
 	payload: {}
 });
-export const setTheme = (theme) => ({
+export const setTheme = theme => ({
 	type: SET_THEME,
 	payload: {
 		theme
@@ -79,28 +85,28 @@ export const saveDocumentValueAsync = documentData => ({
 	type: EDITOR_SAVE_DOCUMENT_ASYNC,
 	payload: documentData
 })
-export const setActiveDocumentId = (value) => ({
+export const setActiveDocumentId = value => ({
 	type: EDITOR_SET_ACTIVE_DOCUMENT_ID,
 	payload: value
 })
-export const setActiveDocumentTitle = (value) => ({
+export const setActiveDocumentTitle = value => ({
 	type: EDITOR_SET_ACTIVE_DOCUMENT_TITLE,
 	payload: value
 })
-export const setActiveDocumentValue = (value) => ({
+export const setActiveDocumentValue = value => ({
 	type: EDITOR_SET_ACTIVE_DOCUMENT_VALUE,
 	payload: value
 })
 
-export const setShortcutTarget = (value) => ({
+export const setShortcutTarget = value => ({
 	type: EDITOR_SET_SHORTCUT_TARGET,
 	payload: value
 })
-export const setShortcutSearch = (value) => ({
+export const setShortcutSearch = value => ({
 	type: EDITOR_SET_SHORTCUT_SEARCH,
 	payload: value
 })
-export const setShortcutDropdownIndex = (value) => ({
+export const setShortcutDropdownIndex = value => ({
 	type: EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX,
 	payload: value
 })

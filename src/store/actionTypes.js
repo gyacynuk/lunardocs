@@ -1,3 +1,6 @@
+// Global
+export const SET_LOADING = 'SET_LOADING'
+
 // Auth
 export const SET_AUTH_USER = 'SET_AUTH_USER'
 

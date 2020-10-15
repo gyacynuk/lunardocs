@@ -252,7 +252,7 @@ const TextEditor = ({ documentId, ...props }) => {
     // Load in current document
     useEffect(() => {
         dispatch(openDocument(documentId))
-    }, [])
+    }, [documentId])
 
     // Create a Slate editor object that won't change across renders.
     const editor = useMemo(() => withCustomElements(withReact(withHistory(createEditor()))), []);

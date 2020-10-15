@@ -1,6 +1,6 @@
 import { put, call, takeLatest, delay } from 'redux-saga/effects'
 import Api, { db } from '../../api'
-import { setDocuments } from '../actions';
+import { setDocuments, setLoading } from '../actions';
 import { FETCH_DOCUMENTS_ASYNC } from '../actionTypes';
 
 function* fetchDocumentsAsync(action) {
