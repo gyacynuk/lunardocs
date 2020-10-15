@@ -319,12 +319,20 @@ const TextEditor = ({ documentId, ...props }) => {
             switch (event.key) {
             case 'Enter': 
                 if (event.shiftKey) {
-                    const [matchingCodeblock] = Editor.nodes(editor, {
-                        at: getCurrentPath(editor),
-                        match: n => n.type === 'codeblock',
-                    })
                     
-                    if (!!matchingCodeblock) {
+                    if (isAnyListActive(editor)) {
+                        event.preventDefault();
+                        // If cursor is at end of line, add a new list item below
+                        if (Editor.isEnd(editor, editor.selection.anchor, editor.selection.anchor.path)) {
+                            const listItem = { type: 'list-item', children: [{ text: '' }] }
+                            Transforms.insertNodes(editor, listItem)
+                        }
+                        // Otherwise split the current list item
+                        else {
+                            Transforms.splitNodes(editor)
+                        }
+                    }
+                    else if (isBlockActive(editor, 'codeblock')){
                         event.preventDefault();
                         Editor.insertText(editor, '\r\n');
                         break
@@ -356,8 +364,7 @@ const TextEditor = ({ documentId, ...props }) => {
         if (documentValue != value) {
             dispatch(saveDocumentValueAsync({
                 id: documentId,
-                value: value,
-                timestamp: + new Date()
+                value: value
             }))
         }
         
