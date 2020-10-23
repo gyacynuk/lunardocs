@@ -5,6 +5,27 @@ export const USER_DOCUMENT_COLLECTION = 'documents'
 
 /**
  * 
+ * @param {string} title 
+ */
+export const createNewDocumentValue = title => {
+    if (title === '') {
+        title = "Untitled Document"
+    }
+    
+    return [
+        {
+            type: "title",
+            children: [{ text: title }]
+        },
+        {
+            type: "paragraph",
+            children: [{ text : "" }]
+        },
+    ]
+}
+
+/**
+ * 
  * @param {firebase.firestore.Firestore} db 
  * @param {string} userId 
  * @param {string} documentId 

@@ -1,6 +1,6 @@
 import firebase from 'firebase'
 import { fetchUser, signOutUser, upsertUser } from './user'
-import { saveDocument } from './editor'
+import { saveDocument, createNewDocumentValue } from './editor'
 import { fetchAllDocuments, fetchDocumentById } from './documents'
 
 export const fire = firebase.initializeApp({
@@ -19,6 +19,7 @@ export default {
     fetchUser,
     signOutUser,
     upsertUser,
+    createNewDocumentValue,
     saveDocument,
     fetchAllDocuments,
     fetchDocumentById,

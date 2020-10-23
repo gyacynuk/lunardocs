@@ -99,7 +99,7 @@ export default {
       fontFamily: fontFamily,
       fontWeight: fontWeightMedium,
       fontSize: '2.5rem',
-      lineHeight: 1.1,
+      lineHeight: 1.2,
     },
     h1: {
       fontFamily: fontFamily,
