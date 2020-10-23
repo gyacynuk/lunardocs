@@ -7,7 +7,7 @@ import { createEditor, Editor, Transforms, Range } from 'slate'
 import { Slate, Editable, withReact, ReactEditor, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
 
-import withCustomElements, { SHORTCUTS } from './custom-elements';
+import withCustomElements, { isElementBlock, SHORTCUTS } from './custom-elements';
 import withLayout from './layout';
 
 import ContentPane from "../../components/content-pane";
@@ -65,41 +65,23 @@ const HOTKEYS = {
 }
 
 const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
-const getMatchingShortcuts = searchText => SHORTCUTS
+const getMatchingShortcuts = searchText => {
+    if (searchText === '') {
+        return SHORTCUTS
+            .map(shortcut => shortcut.name)
+            .slice(0, MAX_SHORTCUT_DROPDOWN_SIZE);
+    }
+    return SHORTCUTS
         .map(shortcut => shortcut.name)
         .filter(shortcut => shortcut.startsWith(searchText.toLowerCase()))
         .slice(0, MAX_SHORTCUT_DROPDOWN_SIZE);
+}
 
 const insertShortcut = (editor, shortcut) => {
-    switch (shortcut) {
-        case 'bulleted-list': {
-            toggleBlock(editor, 'bulleted-list')
-            break
-        }
-        case 'code': {
-            toggleMark(editor, 'code');
-            break
-        }
-        case 'codeblock': {
-            toggleBlock(editor, 'codeblock')
-            break
-        }
-        case 'header1': {
-            toggleBlock(editor, 'header1')
-            break
-        }
-        case 'header2': {
-            toggleBlock(editor, 'header2')
-            break
-        }
-        case 'header3': {
-            toggleBlock(editor, 'header3')
-            break
-        }
-        case 'numbered-list': {
-            toggleBlock(editor, 'numbered-list')
-            break
-        }
+    if (isElementBlock(shortcut)) {
+        toggleBlock(editor, shortcut);
+    } else {
+        toggleMark(editor, shortcut);
     }
 
     // Delete current selection (shortcut typed by user)
@@ -148,15 +130,15 @@ const setBlock = (editor, format) => {
         match: n => LIST_TYPES.includes(n.type),
         split: true,
     })
-  
-    Transforms.setNodes(editor, {
-        type: isList ? 'list-item' : format,
-    })
-  
+
     if (isList) {
         const block = { type: format, children: [] }
         Transforms.wrapNodes(editor, block)
     }
+  
+    Transforms.setNodes(editor, {
+        type: isList ? 'list-item' : format,
+    })
 }
 
 const toggleBlock = (editor, format) => {
@@ -312,6 +294,7 @@ const TextEditor = ({ documentId, ...props }) => {
 
     const onChange = value => {
         // If the document state has changes, then queue up an async debounced save
+        console.log(value)
         if (documentValue != value) {
             const titleString = Editor.string(editor, [0]);
             dispatch(saveDocumentValueAsync({
@@ -324,24 +307,40 @@ const TextEditor = ({ documentId, ...props }) => {
         const { selection } = editor
 
         if (selection && Range.isCollapsed(selection)) {
-          const [start] = Range.edges(selection)
-          const wordBefore = Editor.before(editor, start, { unit: 'word' })
-          const before = wordBefore && Editor.before(editor, wordBefore)
-          const beforeRange = before && Editor.range(editor, before, start)
-          const beforeText = beforeRange && Editor.string(editor, beforeRange)
-          const beforeMatch = beforeText && beforeText.match(/^\/([\w\-]+)$/)
-          const after = Editor.after(editor, start)
-          const afterRange = Editor.range(editor, start, after)
-          const afterText = Editor.string(editor, afterRange)
-          const afterMatch = afterText.match(/^(\s|$)/)
+            // If the user has started typing something after the slash, then filter down the list to only things that
+            // match
+            const [start] = Range.edges(selection)
+            const wordBefore = Editor.before(editor, start, { unit: 'word' })
+            const before = wordBefore && Editor.before(editor, wordBefore)
+            const beforeRange = before && Editor.range(editor, before, start)
+            const beforeText = beforeRange && Editor.string(editor, beforeRange)
+            const beforeMatch = beforeText && beforeText.match(/^\/([\w\-]*)$/)
+            const after = Editor.after(editor, start)
+            const afterRange = Editor.range(editor, start, after)
+            const afterText = Editor.string(editor, afterRange)
+            const afterMatch = afterText.match(/^(\s|$)/)
+            if (beforeMatch && afterMatch && getMatchingShortcuts(beforeMatch[1].toLowerCase()).length != 0) {
+                dispatch(setShortcutTarget(beforeRange))
+                dispatch(setShortcutSearch(beforeMatch[1]))
+                dispatch(setShortcutDropdownIndex(0))
+                return
+            }
 
-          // And in paragraph node
-          if (beforeMatch && afterMatch && getMatchingShortcuts(beforeMatch[1].toLowerCase()).length != 0) {
-            dispatch(setShortcutTarget(beforeRange))
-            dispatch(setShortcutSearch(beforeMatch[1]))
-            dispatch(setShortcutDropdownIndex(0))
-            return
-          }
+            // If the user has just typed a slash (start of line, or after a space) then show them a dropdown of
+            // all the availible options
+            const charBefore = Editor.before(editor, start, { unit: 'character' }) 
+            const slashBefore = charBefore && Editor.before(editor, charBefore)
+            const slashBeforeRange = slashBefore && Editor.range(editor, slashBefore, start)
+            const slashBeforeText = slashBeforeRange && Editor.string(editor, slashBeforeRange) 
+            const justSlash = slashBeforeText && slashBeforeText.match(/^.*\s\/$/)
+            const justSlashMatch = !!justSlash && !!justSlash[0]
+
+            if (justSlashMatch) {
+                dispatch(setShortcutTarget(slashBeforeRange))
+                dispatch(setShortcutSearch(''))
+                dispatch(setShortcutDropdownIndex(0))
+                return
+            }
         }
 
         dispatch(setShortcutTarget(null))

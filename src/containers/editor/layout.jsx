@@ -38,7 +38,8 @@ const withLayout = editor => {
                 // `child` is NOT the first node in the document
                 else {
                     // Ensure only the first node is a title node
-                    if (child.type === 'title') {
+                    // Ensure there are no top-level list-item nodes (these must be wrapped in some outer list, such as a bulleted-list)
+                    if (child.type === 'title' || child.type === 'list-item') {
                         Transforms.setNodes(editor, { type: 'paragraph' }, { at: childPath });
                     }
                 }

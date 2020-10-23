@@ -1,7 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
+const DropDownContainerAppearAnimation = keyframes`
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+`
 const DropDownContainer = styled.div`
     position: absolute;
     padding: 4px;
@@ -11,6 +20,8 @@ const DropDownContainer = styled.div`
     border-radius: 4px;
     background-color: ${({ theme }) => theme.palette.background};
     box-shadow: 0 1px 5px ${({ theme }) => theme.palette.shadow};
+
+    animation: ${DropDownContainerAppearAnimation} 200ms ease;
 `
 
 const DropDownItem = styled.div`

@@ -3,19 +3,23 @@ import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 
 export const SHORTCUTS = [
-    { name: 'bulleted-list', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'code' },
-    { name: 'codeblock', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header1', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header2', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header3', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'image', nodeProperties: { isInline: false, isVoid: true } },
-    { name: 'link', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'list', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'numbered-list', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'bulleted-list', type: 'block', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'code', type: 'mark' },
+    { name: 'codeblock', type: 'block', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header1', type: 'block', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header2', type: 'block', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'header3', type: 'block', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'paragraph', type: 'block', nodeProperties: { isInline: false, isVoid: false } },
+    // { name: 'image', nodeProperties: { isInline: false, isVoid: true } },
+    // { name: 'link', nodeProperties: { isInline: false, isVoid: false } },
+    { name: 'numbered-list', type: 'block', nodeProperties: { isInline: false, isVoid: false } },
 ];
 export const SHORTCUTS_MAP = SHORTCUTS.reduce((map, shortcut) => (map[shortcut.name] = shortcut, map), {});
 export const MARKS = ['bold', 'italic', 'underline', 'code']
+
+export const isElementBlock = name => {
+    return !!SHORTCUTS.find(shortcut => shortcut.name === name && shortcut.type === 'block');
+}
 
 export const isElementInline = name => {
     const element = SHORTCUTS_MAP[name];
