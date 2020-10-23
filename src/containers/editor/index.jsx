@@ -49,12 +49,13 @@ const StyledEditable = styled(Editable)`
 `
 
 const BLOCK_TYPES = [
-    { type: 'title', name: 'Title', selectable: false },
     { type: 'header1', name: 'Header 1', selectable: true },
     { type: 'header2', name: 'Header 2', selectable: true },
     { type: 'header3', name: 'Header 3', selectable: true },
     { type: 'paragraph', name: 'Paragraph', selectable: true },
     { type: 'codeblock', name: 'Code Block', selectable: true },
+    // Non-selectable block types MUST go at the bottom of this list
+    { type: 'title', name: 'Title', selectable: false },
 ]
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const HOTKEYS = {
