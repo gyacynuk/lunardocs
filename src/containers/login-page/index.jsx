@@ -35,7 +35,7 @@ const LoginPage = ({ history }) => {
             for (let mutation of mutationsList) {
                 if (mutation.type === 'childList' && mutation.target.id === 'firebaseui_container') {
                     ReactDOM.render(
-                        <PageLoadingAnimation/>,
+                        <PageLoadingAnimation centerOnScreen={true}/>,
                         document.body.appendChild(mutation.target)
                     );
                 }

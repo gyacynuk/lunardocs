@@ -17,23 +17,26 @@ const LoadingAnimation = keyframes`
 `
 
 const LoadingBar = styled.div`
-    width: 6px;
-    margin: 0 4px;
-    border-radius: 6px;
+    width: ${props => props.barWidth};
+    margin: 0 ${props => props.barSpacing};
+    border-radius: ${props => props.barWidth};
 
     background-color: ${({ theme }) => (!!theme && !!theme.palette) ? theme.palette.text.heavy : '#bcbcbc'};
-    animation: ${LoadingAnimation} 1200ms infinite;
+
+    animation: ${LoadingAnimation} 1200ms ${({ animate }) => animate ? `infinite` : `0`};
 `
 
 const Container = styled.div`
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    ${({ centerOnScreen }) => centerOnScreen && `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    `}
 
     display: flex;
     align-items: center;
-    height: 40px;
+    height: ${props => props.height};
 
     ${LoadingBar} {
         &:nth-child(1) {
@@ -48,16 +51,30 @@ const Container = styled.div`
     }
 `
 
-const PageLoadingAnimation = () => {
+const PageLoadingAnimation = props => {
     return (
-        <Container>
-            <LoadingBar/>
-            <LoadingBar/>
-            <LoadingBar/>
+        <Container {...props}>
+            <LoadingBar {...props}/>
+            <LoadingBar {...props}/>
+            <LoadingBar {...props}/>
         </Container>
     );
 };
 
-PageLoadingAnimation.propTypes = {};
+PageLoadingAnimation.defaultProps = {
+    animate: true,
+    centerOnScreen: false,
+    barSpacing: '4px',
+    barWidth: '6px',
+    height: '40px',
+}
+
+PageLoadingAnimation.propTypes = {
+    animate: PropTypes.bool,
+    centerOnScreen: PropTypes.bool,
+    barSpacing: PropTypes.string,
+    barWidth: PropTypes.string,
+    height: PropTypes.string,
+};
 
 export default PageLoadingAnimation;

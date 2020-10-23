@@ -1,13 +1,20 @@
-import { EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET, EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX, EDITOR_SET_ACTIVE_DOCUMENT_TITLE, EDITOR_SET_ACTIVE_DOCUMENT_ID, EDITOR_CLOSE_DOCUMENT } from "../actionTypes";
+import { EDITOR_SET_ACTIVE_DOCUMENT_VALUE, EDITOR_SET_SHORTCUT_TARGET, EDITOR_SET_SHORTCUT_SEARCH, EDITOR_SET_SHORTCUT_DROP_DOWN_INDEX, EDITOR_SET_ACTIVE_DOCUMENT_TITLE, EDITOR_SET_ACTIVE_DOCUMENT_ID, EDITOR_CLOSE_DOCUMENT, EDITOR_SET_SAVE_PENDING } from "../actionTypes";
 
-const initialState = {
+export const initialState = {
+    savePending: false,
     activeDocument: {
         id: '',
         title: '',
-        value: [{
-            type: 'paragraph',
-            children: [{ text: '' }],
-        }],
+        value: [
+            {
+                type: 'title',
+                children: [{ text: 'Untitled Document' }],
+            },
+            {
+                type: 'paragraph',
+                children: [{ text: '' }],
+            }
+        ],
     },
     shortcut:{
         target: null,
@@ -74,6 +81,12 @@ export default (state = initialState, action) => {
         }
         case EDITOR_CLOSE_DOCUMENT: {
             return initialState;
+        }
+        case EDITOR_SET_SAVE_PENDING: {
+            return {
+                ...state,
+                savePending: action.payload
+            }
         }
         default:
             return state;

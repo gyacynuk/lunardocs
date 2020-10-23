@@ -22,3 +22,4 @@ export const getShortcutSearch = store => store.editor.shortcut.search;
 export const getShortcutDropdownIndex = store => store.editor.shortcut.dropdownIndex;
 
 export const isActiveDocumentLoaded = store => store.editor.activeDocument.id !== '';
+export const isSavePending= store => store.editor.savePending;

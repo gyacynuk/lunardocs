@@ -23,7 +23,7 @@ const PrivateRoute = ({ component, children, ...props }) => {
         <Route {...props}>
             {
                 loading
-                    ? <PageLoadingAnimation/>
+                    ? <PageLoadingAnimation centerOnScreen={true}/>
                     : userSignedIn
                         ? routeComponent
                         : <Redirect to={"/login"} />

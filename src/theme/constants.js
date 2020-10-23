@@ -5,6 +5,8 @@ const navBarPaddingY = 24;
 const dotSize = 14;
 
 const editorToolBarHeight = 32;
+const editorToolBarIconMargins = 16;
+const editorToolBarSpacerMargins = 32;
 
 export default {
     navBar: {
@@ -20,13 +22,15 @@ export default {
             height: 24px;
             margin: 0 16px;
 
+            transition: stroke 200ms ease;
+            transition: fill 200ms ease;
+
             cursor: pointer;
         `,
         strokeStyleWith: theme => `
             stroke: ${theme.palette.text.heavy};
             stroke-width: 1.5;
 
-            transition: stroke 200ms ease;
             &:hover {
                 stroke: #7C89FF;
             }
@@ -34,7 +38,6 @@ export default {
         fillStyleWith: theme => `
             fill: ${theme.palette.text.heavy};
 
-            transition: fill 200ms ease;
             &:hover {
                 fill: #7C89FF;
             }
@@ -45,5 +48,14 @@ export default {
     },
     editor: {
         toolBarHeight: `${editorToolBarHeight}px`,
+        icons: {
+            margins: `${editorToolBarIconMargins}px`,
+            textButtonWidth: `20px`,
+        },
+        spacers: {
+            height: `20px`,
+            marginLeft: `${editorToolBarSpacerMargins - editorToolBarIconMargins}px`,
+            marginRight: `${editorToolBarSpacerMargins}px`,
+        }
     }
 }

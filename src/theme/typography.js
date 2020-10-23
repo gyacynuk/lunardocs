@@ -95,22 +95,28 @@ export default {
       lineHeight: 1.2,
     },
 
+    title: {
+      fontFamily: fontFamily,
+      fontWeight: fontWeightMedium,
+      fontSize: '2.5rem',
+      lineHeight: 1.1,
+    },
     h1: {
       fontFamily: fontFamily,
       fontWeight: fontWeightMedium,
-      fontSize: '2.3rem',
+      fontSize: '2rem',
       lineHeight: 1.2,
     },
     h2: {
       fontFamily: fontFamily,
-      fontWeight: fontWeightRegular,
-      fontSize: '1.75rem',
+      fontWeight: fontWeightMedium,
+      fontSize: '1.5rem',
       lineHeight: 1.2,
     },
     h3: {
       fontFamily: fontFamily,
-      fontWeight: fontWeightLight,
-      fontSize: '1.5rem',
+      fontWeight: fontWeightMedium,
+      fontSize: '1.3rem',
       lineHeight: 1.2,
     },
   }

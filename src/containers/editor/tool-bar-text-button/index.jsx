@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const ButtonComponent = styled.div`
+    width:  ${({theme}) => theme.constants.editor.icons.textButtonWidth};
     margin-right: ${({theme}) => theme.constants.editor.icons.margins};
+
+    text-align: center;
     cursor: pointer;
 
     color: ${props => props.active
@@ -17,7 +20,7 @@ const ButtonComponent = styled.div`
         : props.theme.palette.text.light};
 `
 
-const ToolBarButton = props => {
+const ToolBarTextButton = props => {
     return (
         <ButtonComponent {...props} onMouseDown={event => { event.preventDefault(); props.onMouseDown(event); }}>
             {props.children}
@@ -25,6 +28,6 @@ const ToolBarButton = props => {
     );
 };
 
-ToolBarButton.propTypes = {};
+ToolBarTextButton.propTypes = {};
 
-export default ToolBarButton;
+export default ToolBarTextButton;

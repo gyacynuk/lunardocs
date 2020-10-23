@@ -1,24 +1,41 @@
 import React, { useCallback, useMemo, useRef, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import imageExtensions from 'image-extensions'
-import isUrl from 'is-url'
-import isHotkey, { toKeyName } from 'is-hotkey'
+import isHotkey from 'is-hotkey'
 
 import { createEditor, Editor, Transforms, Range } from 'slate'
 import { Slate, Editable, withReact, ReactEditor, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
 
+import withCustomElements, { SHORTCUTS } from './custom-elements';
+import withLayout from './layout';
+
 import ContentPane from "../../components/content-pane";
 import Portal from '../../components/portal'
-import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header2Element, Header3Element } from "./elements";
+import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header2Element, Header3Element, TitleElement } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
 import { setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex, saveDocumentValueAsync, openDocument } from "../../store/actions";
+
 import ToolBar from "./tool-bar";
 import ToolBarButton from "./tool-bar-button";
+import ToolBarTextButton from './tool-bar-text-button';
 import DropDown from "../../components/drop-down";
 import ToolBarDropDown from "./tool-bar-drop-down";
+import ToolBarSpacer from "./tool-bar-spacer";
+
+import { ReactComponent as BulletedListSVG } from '../../assets/icons/bulleted-list.svg'
+import { ReactComponent as NumberedListSVG } from '../../assets/icons/numbered-list.svg'
+
+
+const BulletedListIcon = styled(BulletedListSVG)`
+    width: 20px;
+    height: 20px;
+`
+const NumberedListIcon = styled(NumberedListSVG)`
+    width: 20px;
+    height: 20px;
+`
 
 const StyledEditable = styled(Editable)`
     height: calc(100% - ${({ theme }) => theme.constants.editor.toolBarHeight});
@@ -32,11 +49,12 @@ const StyledEditable = styled(Editable)`
 `
 
 const BLOCK_TYPES = [
-    {type: 'header1', name: 'Header 1'},
-    {type: 'header2', name: 'Header 2'},
-    {type: 'header3', name: 'Header 3'},
-    {type: 'paragraph', name: 'Paragraph '},
-    {type: 'codeblock', name: 'Code Block'},
+    { type: 'title', name: 'Title', selectable: false },
+    { type: 'header1', name: 'Header 1', selectable: true },
+    { type: 'header2', name: 'Header 2', selectable: true },
+    { type: 'header3', name: 'Header 3', selectable: true },
+    { type: 'paragraph', name: 'Paragraph', selectable: true },
+    { type: 'codeblock', name: 'Code Block', selectable: true },
 ]
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const HOTKEYS = {
@@ -46,85 +64,10 @@ const HOTKEYS = {
 }
 
 const MAX_SHORTCUT_DROPDOWN_SIZE = 10;
-const SHORTCUTS = [
-    { name: 'bulleted-list', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'code' },
-    { name: 'codeblock', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header1', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header2', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'header3', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'image', nodeProperties: { isInline: false, isVoid: true } },
-    { name: 'link', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'list', nodeProperties: { isInline: false, isVoid: false } },
-    { name: 'numbered-list', nodeProperties: { isInline: false, isVoid: false } },
-];
-const SHORTCUTS_MAP = SHORTCUTS.reduce((map, shortcut) => (map[shortcut.name] = shortcut, map), {});
-
 const getMatchingShortcuts = searchText => SHORTCUTS
         .map(shortcut => shortcut.name)
         .filter(shortcut => shortcut.startsWith(searchText.toLowerCase()))
         .slice(0, MAX_SHORTCUT_DROPDOWN_SIZE);
-
-const isElementInline = name => {
-    const element = SHORTCUTS_MAP[name];
-    if (!element) return false;
-
-    return element.nodeProperties && element.nodeProperties.isInline;
-}
-
-const isElementVoid = name => {
-    const element = SHORTCUTS_MAP[name];
-    if (!element) return false;
-
-    return element.nodeProperties && element.nodeProperties.isVoid;
-}
-
-const withCustomElements = editor => {
-    const { isInline, isVoid, insertData } = editor;
-  
-    editor.isInline = element => isElementInline(element.type) ? true : isInline(element);
-    editor.isVoid = element => isElementVoid(element.type) ? true : isVoid(element);
-
-    editor.insertData = data => {
-        const text = data.getData('text/plain')
-        const { files } = data
-
-        if (files && files.length > 0) {
-            for (const file of files) {
-                const reader = new FileReader()
-                const [mime] = file.type.split('/')
-
-                if (mime === 'image') {
-                    reader.addEventListener('load', () => {
-                        const url = reader.result
-                        insertImage(editor, url)
-                    })
-
-                    reader.readAsDataURL(file)
-                }
-            }
-        } else if (isImageUrl(text)) {
-            insertImage(editor, text)
-        } else {
-            insertData(data)
-        }
-    }
-
-    return editor;
-}
-
-const isImageUrl = url => {
-    if (!url) return false
-    if (!isUrl(url)) return false
-    const ext = new URL(url).pathname.split('.').pop()
-    return imageExtensions.includes(ext)
-}
-
-const insertImage = (editor, url) => {
-    const text = { text: '' }
-    const image = { type: 'image', url, children: [text] }
-    Transforms.insertNodes(editor, image)
-}
 
 const insertShortcut = (editor, shortcut) => {
     switch (shortcut) {
@@ -234,7 +177,7 @@ const TextEditor = ({ documentId, ...props }) => {
     }, [documentId])
 
     // Create a Slate editor object that won't change across renders.
-    const editor = useMemo(() => withCustomElements(withReact(withHistory(createEditor()))), []);
+    const editor = useMemo(() => withLayout(withCustomElements(withReact(withHistory(createEditor())))), []);
 
     const ref = useRef();
 
@@ -367,8 +310,11 @@ const TextEditor = ({ documentId, ...props }) => {
     }, [matchingShortcuts.length, editor, shortcutTarget, shortcutSearch, shortcutDropdownIndex])
 
     const onChange = value => {
+        // If the document state has changes, then queue up an async debounced save
         if (documentValue != value) {
+            const titleString = Editor.string(editor, [0]);
             dispatch(saveDocumentValueAsync({
+                title: titleString === '' ? 'Untitled Document' : titleString,
                 id: documentId,
                 value: value
             }))
@@ -418,7 +364,9 @@ const TextEditor = ({ documentId, ...props }) => {
                 return <li {...props.attributes}>{props.children}</li>
             case 'numbered-list':
                 return <ol {...props.attributes}>{props.children}</ol>
-            case 'paragraph':
+            case 'title':
+                return <TitleElement {...props} />
+            case 'paragraph':  // Fall through
             default:
                 return <DefaultElement {...props} />
         }
@@ -429,6 +377,8 @@ const TextEditor = ({ documentId, ...props }) => {
     }, []);
 
     return (
+        <>
+        {/* <EditorNavBar/> */}
         <ContentPane>
             <Slate
             editor={editor}
@@ -436,23 +386,29 @@ const TextEditor = ({ documentId, ...props }) => {
             onChange={onChange}>
             <ToolBar>
                 <BlockDropDown dropDownState={dropDownState} setDropDownState={setDropDownState}/>
-                <MarkButton format={'bold'}>
+
+                <ToolBarSpacer marginLeft={'0px'}/>
+
+                <MarkTextButton format={'bold'}>
                     <strong>B</strong>
-                </MarkButton>
-                <MarkButton format={'italic'}>
+                </MarkTextButton>
+                <MarkTextButton format={'italic'}>
                     <em>I</em>
-                </MarkButton>
-                <MarkButton format={'underline'}>
+                </MarkTextButton>
+                <MarkTextButton format={'underline'}>
                     <u>U</u>
-                </MarkButton>
-                <MarkButton format={'code'}>
+                </MarkTextButton>
+                <MarkTextButton format={'code'}>
                     <code>{'<>'}</code>
-                </MarkButton>
+                </MarkTextButton>
+
+                <ToolBarSpacer/>
+
                 <BlockButton format={'bulleted-list'}>
-                    <code>{'•'}</code>
+                    <BulletedListIcon/>
                 </BlockButton>
                 <BlockButton format={'numbered-list'}>
-                    <code>{'1.'}</code>
+                    <NumberedListIcon/>
                 </BlockButton>
             </ToolBar>
             <StyledEditable
@@ -473,6 +429,7 @@ const TextEditor = ({ documentId, ...props }) => {
                 )}
             </Slate>
         </ContentPane>
+        </>
     );
 };
 
@@ -482,6 +439,15 @@ const MarkButton = ({ format, children }) => {
         <ToolBarButton active={isMarkActive(editor, format)} onMouseDown={() => toggleMark(editor, format)}>
             {children}
         </ToolBarButton>
+    )
+}
+
+const MarkTextButton = ({ format, children }) => {
+    const editor = useSlate();
+    return (
+        <ToolBarTextButton active={isMarkActive(editor, format)} onMouseDown={() => toggleMark(editor, format)}>
+            {children}
+        </ToolBarTextButton>
     )
 }
 
@@ -503,7 +469,7 @@ const BlockDropDown = ({ dropDownState, setDropDownState }) => {
             {dropDownState && (
                 <DropDown
                 margin={'4px 0 0 -7px'}
-                items={BLOCK_TYPES.map(blockType => blockType.name)}
+                items={BLOCK_TYPES.filter(blockType => blockType.selectable).map(blockType => blockType.name)}
                 isSelected={(e, i) => currentBlockType && e === currentBlockType.name}
                 onSelected={(e, i) => setBlock(editor, BLOCK_TYPES[i].type)}
                 onClickOutside={() => setDropDownState(false)}/>

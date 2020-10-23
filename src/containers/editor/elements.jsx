@@ -41,6 +41,20 @@ export const DefaultElement = props => {
     )
 }
 
+const TitleStyle = styled.div`
+    font-family: ${({ theme }) => theme.typography.editor.title.fontFamily};
+    font-weight: ${({ theme }) => theme.typography.editor.title.fontWeight};
+    font-size: ${({ theme }) => theme.typography.editor.title.fontSize};
+    line-height: ${({ theme }) => theme.typography.editor.title.lineHeight};
+`
+export const TitleElement = props => {
+    return (
+        <TitleStyle {...props.attributes}>
+            {props.children}
+        </TitleStyle>
+    )
+}
+
 const Header1Style = styled.div`
     font-family: ${({ theme }) => theme.typography.editor.h1.fontFamily};
     font-weight: ${({ theme }) => theme.typography.editor.h1.fontWeight};
