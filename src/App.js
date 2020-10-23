@@ -60,7 +60,6 @@ const App = () => {
                             <DocumentBrowser/>
                         </PrivateRoute>
                         <PrivateRoute path="/documents/edit/:documentId" exact>
-                            <EditorNavBar/>
                             <Editor/>
                         </PrivateRoute>
                     </Switch>

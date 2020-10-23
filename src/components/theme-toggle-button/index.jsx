@@ -30,7 +30,7 @@ const ThemeToggleButton = () => {
     
     return (<>
         <MoonIcon data-tip data-for="theme" onClick={() => dispatch(setUserPreferredTheme(oppositeTheme(theme)))}/>
-        <ReactTooltip id="theme" place="bottom" effect="solid">
+        <ReactTooltip id="theme" place="bottom" effect="solid" offset={{  left: 6 }}> {/* offset is to fix a bug with tooltips inside of flexbox */}
             Toggle Theme
         </ReactTooltip>
     </>);
