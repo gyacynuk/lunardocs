@@ -1,10 +1,13 @@
-import React, { useRef, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from 'prop-types';
 import RowItem from '../row-item';
 import styled from 'styled-components';
+import { withRouter } from 'react-router-dom'
 
 import { ReactComponent as PlusSVG } from '../../../assets/icons/plus.svg';
 import { useFocus } from '../../../utils'
+import { useDispatch } from "react-redux";
+import { createDocument } from "../../../store/actions";
 
 const Dot = styled.div`
     display: flex;
@@ -50,16 +53,24 @@ const TitleInput = styled.input`
     }
 `
 
-const NewDocumentButton = () => {
+const NewDocumentButton = ({ history }) => {
+    const dispatch = useDispatch();
     const [focusRef, setFocus] = useFocus();
+    const [titleField, setTitleField] = useState('');
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            dispatch(createDocument(history, titleField));
+        }
+    }
 
     return (
         <RowItem onClick={setFocus}>
             <Dot> 
-                <PlusIcon/>
+                <PlusIcon onClick={() => dispatch(createDocument(history, titleField))}/>
             </Dot>
             <ContentContainer>
-                <TitleInput ref={focusRef} type="text" placeholder="New Document"/>
+                <TitleInput ref={focusRef} value={titleField} onChange={e => setTitleField(e.target.value)} onKeyDown={handleKeyDown} type="text" placeholder="New Document"/>
             </ContentContainer>
         </RowItem>
     );
@@ -67,4 +78,4 @@ const NewDocumentButton = () => {
 
 NewDocumentButton.propTypes = {};
 
-export default NewDocumentButton;
+export default withRouter(NewDocumentButton);

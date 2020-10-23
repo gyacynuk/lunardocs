@@ -7,13 +7,13 @@ export const initialState = {
         title: '',
         value: [
             {
-                type: 'title',
-                children: [{ text: 'Untitled Document' }],
+                type: "title",
+                children: [{ text: "Untitled Document" }]
             },
             {
-                type: 'paragraph',
-                children: [{ text: '' }],
-            }
+                type: "paragraph",
+                children: [{ text : "" }]
+            },
         ],
     },
     shortcut:{

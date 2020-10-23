@@ -1,10 +1,28 @@
 import { put, call, takeLatest, delay, select } from 'redux-saga/effects'
 import { EDITOR_SAVE_DELAY_MILLIS } from '../../api/constants'
 import { setActiveDocumentId, setActiveDocumentTitle, setActiveDocumentValue, closeDocument, saveDocumentValueAsync, setLoading, setSavePending } from '../actions'
-import { EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT } from '../actionTypes'
+import { EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT, EDITOR_CREATE_DOCUMENT } from '../actionTypes'
 import Api, { db } from '../../api'
 import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue, isActiveDocumentLoaded, isSavePending } from '../selectors'
 import { initialState } from '../reducers/editor'
+import { v4 as uuid } from 'uuid';
+
+
+function* createNewDocument(action) {
+    const { history, documentTitle } = action.payload; 
+
+    const id = uuid();
+    const value = Api.createNewDocumentValue(documentTitle);
+
+    yield put(setActiveDocumentId(id));
+    yield put(setActiveDocumentValue(value));
+
+    yield delay(100); // Seems like the array update in the reducer isnt atomic... need a short delay
+    history.push(`documents/edit/${id}`);
+}
+export function* watchCreateNewDocument() {
+    yield takeLatest(EDITOR_CREATE_DOCUMENT, createNewDocument);
+}
 
 function* openDocument(action) {
     const isDocumentAlreadyLoaded = yield select(isActiveDocumentLoaded);
