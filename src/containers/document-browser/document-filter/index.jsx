@@ -51,6 +51,14 @@ const Dot = styled.div`
     }
 `
 
+const TAGS = [
+    { name: 'red', displayName: 'Red Tag', color: 'red' },
+    { name: 'violet', displayName: 'Violet Tag', color: 'violet' },
+    { name: 'cyan', displayName: 'Cyan Tag', color: 'lightBlue' },
+    { name: 'green', displayName: 'Greeb Tag', color: 'lightGreen' },
+    { name: 'yellow', displayName: 'Yellow Tag', color: 'yellow' },
+]
+
 const DocumentFilter = () => {
     const dispatch = useDispatch()
     const tags = useSelector(getDocumentFilterTags)
@@ -65,30 +73,14 @@ const DocumentFilter = () => {
                 Filter
             </Label>
             <InnerContainer>
-                <Dot data-tip data-for="dot1" color="red" active={!!tags.red ? 1 : 0} onClick={() => toggleTag('red')}/>
-                <ReactTooltip id="dot1" place="bottom" effect="solid">
-                    Red Tag
-                </ReactTooltip>
-    
-                <Dot data-tip data-for="dot2" color="violet" active={!!tags.violet ? 1 : 0} onClick={() => toggleTag('violet')}/>
-                <ReactTooltip id="dot2" place="bottom" effect="solid">
-                    Violet Tag
-                </ReactTooltip>
-    
-                <Dot data-tip data-for="dot3" color="lightBlue" active={!!tags.cyan ? 1 : 0} onClick={() => toggleTag('cyan')}/>
-                <ReactTooltip id="dot3" place="bottom" effect="solid">
-                    Cyan Tag
-                </ReactTooltip>
-
-                <Dot data-tip data-for="dot4" color="lightGreen" active={!!tags.green ? 1 : 0} onClick={() => toggleTag('green')}/>
-                <ReactTooltip id="dot4" place="bottom" effect="solid">
-                    Green Tag
-                </ReactTooltip>
-
-                <Dot data-tip data-for="dot5" color="yellow" active={!!tags.yellow ? 1 : 0} onClick={() => toggleTag('yellow')}/>
-                <ReactTooltip id="dot5" place="bottom" effect="solid">
-                    Yellow Tag
-                </ReactTooltip>
+                {TAGS.map(tag => (
+                    <React.Fragment key={tag.name}>
+                        <Dot data-tip data-for={tag.name} color={tag.color} active={!!tags[tag.name] ? 1 : 0} onClick={() => toggleTag(tag.name)}/>
+                        <ReactTooltip id={tag.name} place="bottom" effect="solid">
+                            {tag.displayName}
+                        </ReactTooltip>
+                    </React.Fragment>
+                ))}
             </InnerContainer>
             
         </OuterContainer>
