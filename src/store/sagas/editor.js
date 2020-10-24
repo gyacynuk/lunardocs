@@ -39,25 +39,9 @@ function* openDocument(action) {
     // Load in data
     const id = action.payload; 
     const { title, value } = yield call(Api.fetchDocumentById, db, id);
-    const isWelcomeDocument = yield call(Api.isInitialDocument, id);
-
-    // Handle special case of the initial/welcome document
-    if (isWelcomeDocument) {
-        const initialDoc = yield call(Api.generateInitialDocumentAndDestroyPreset);
-        yield (put(setActiveDocumentId(initialDoc.id)));
-        yield (put(setActiveDocumentTitle(initialDoc.title)));
-        yield (put(setActiveDocumentValue(initialDoc.value)));
-
-        // Save this doc to the user's DB
-        yield put(saveDocumentValueAsync({
-            id: initialDoc.id,
-            title: initialDoc.title,
-            value: initialDoc.value,
-            delay: 0
-        }))
-    }
+    
     // Handle case when document does not exist
-    else if (title == undefined || value == undefined) {
+    if (title == undefined || value == undefined) {
         yield (put(setActiveDocumentId(id)));
         yield (put(setActiveDocumentTitle(initialState.activeDocument.title)));
         yield (put(setActiveDocumentValue(initialState.activeDocument.value)));

@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDocumentFilterTags } from '../../../store/selectors';
 import { setDocumentFilterTag } from '../../../store/actions';
+import { TAGS } from '../index'
 
 const OuterContainer = styled.div`
     display: flex;
@@ -41,23 +42,11 @@ const Dot = styled.div`
     margin-bottom: 8px;
 
     border-radius: 50%;
-    border 1.5px solid ${props => props.color};
+    border: 1.5px solid ${props => props.color};
     background-color: ${props => props.active ? props.color : 'transparent'};
 
     cursor: pointer;
-
-    &:hover {
-        background-color: ${props => props.color};
-    }
 `
-
-const TAGS = [
-    { name: 'red', displayName: 'Red Tag', color: 'red' },
-    { name: 'violet', displayName: 'Violet Tag', color: 'violet' },
-    { name: 'cyan', displayName: 'Cyan Tag', color: 'lightBlue' },
-    { name: 'green', displayName: 'Greeb Tag', color: 'lightGreen' },
-    { name: 'yellow', displayName: 'Yellow Tag', color: 'yellow' },
-]
 
 const DocumentFilter = () => {
     const dispatch = useDispatch()

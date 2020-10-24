@@ -42,7 +42,7 @@ const DropDown = React.forwardRef((props, ref) => {
     useEffect(() => {
         function handleClickOutside(event) {
             if (ref.current && !ref.current.contains(event.target)) {
-                props.onClickOutside && props.onClickOutside();
+                props.onClickOutside && props.onClickOutside(event);
             }
         }
 
@@ -58,25 +58,37 @@ const DropDown = React.forwardRef((props, ref) => {
         <DropDownContainer ref={ref} margin={props.margin}>
             {props.items.map((item, index) => (
                 <DropDownItem
-                key={index}
+                key={item.key || index}
                 isSelected={props.isSelected(item, index)}
-                onMouseDown={event => { event.preventDefault(); props.onSelected(item, index); }}>
-                    {item}
+                onMouseDown={event => { event.preventDefault(); props.onSelected(item, index); }}
+                onClick={e => e.preventDefault()}>
+                    {item.component || item}
                 </DropDownItem>
             ))}
         </DropDownContainer>
     );
 })
 
+const DropDownComponennt = PropTypes.exact({
+    key: PropTypes.string,
+    component: PropTypes.element,
+})
+
 DropDown.propTypes = {
     margin: PropTypes.string,
-    items: PropTypes.arrayOf(PropTypes.string),
+    items: PropTypes.oneOfType([
+        PropTypes.arrayOf(DropDownComponennt),
+        PropTypes.arrayOf(PropTypes.string),
+    ]),
     isSelected: PropTypes.func,
     onSelected: PropTypes.func,
     onClickOutside: PropTypes.func,
 };
 
 DropDown.defaultProps = {
+    margin: '0',
+    isSelected: (e, i) => false,
+    onSelected:  (e, i) => {},
     onClickOutside: () => {}
 }
 

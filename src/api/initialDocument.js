@@ -65,15 +65,16 @@ export function isInitialDocument(id) {
     return id === initialDocumentID
 }
 
-export function generateInitialDocumentNoValue() {
+export function generateInitialDocumentMetaData() {
     return {
         id: initialDocumentID,
         title: initialDocumentTitle,
+        tag: 'red',
         timestamp: + new Date(),
     }
 }
 
-export function generateInitialDocumentAndDestroyPreset() {
+export function generateInitialDocument() {
     // Create inital doc with existing data
     const initalDoc =  {
         id: initialDocumentID,
@@ -82,10 +83,11 @@ export function generateInitialDocumentAndDestroyPreset() {
         timestamp: + new Date(),
     }
 
-    // Scramble the initial UUID, effectively destroying access to the pregenerated doc
-    initialDocumentID = uuid();
-
     // return the doc
     return initalDoc
 }
 
+export function blockAccessToInitialDocument() {
+    // Scramble the initial UUID, effectively destroying access to the pregenerated doc
+    initialDocumentID = uuid();
+}

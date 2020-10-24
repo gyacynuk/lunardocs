@@ -1,7 +1,7 @@
 import { put, call, takeLatest, delay, select, takeEvery } from 'redux-saga/effects'
 import Api, { db } from '../../api'
-import { prependDocument, setDocuments, removeDocument, updateDocument } from '../actions';
-import { FETCH_DOCUMENTS_ASYNC, PREPEND_DOCUMENT_AND_SAVE, REMOVE_DOCUMENT_AND_SAVE, UPDATE_DOCUMENT_AND_SAVE, SAVE_DOCUMENTS } from '../actionTypes';
+import { prependDocument, setDocuments, removeDocument, updateDocument, updateDocumentNotTimestamp } from '../actions';
+import { FETCH_DOCUMENTS_ASYNC, PREPEND_DOCUMENT_AND_SAVE, REMOVE_DOCUMENT_AND_SAVE, UPDATE_DOCUMENT_AND_SAVE, SAVE_DOCUMENTS, UPDATE_DOCUMENT_NOT_TIMESTAMP_AND_SAVE } from '../actionTypes';
 import { areDocumentsLoaded, getDocuments } from '../selectors';
 
 function* fetchDocumentsAsync(action) {
@@ -43,4 +43,14 @@ function* updateDocumentAndSave(action) {
 }
 export function* watchUpdateDocumentAndSave() {
     yield takeLatest(UPDATE_DOCUMENT_AND_SAVE, updateDocumentAndSave);
+}
+
+function* updateDocumentNotTimestampAndSave(action) {
+    yield put(updateDocumentNotTimestamp(action.payload));
+    yield delay(100);
+    const documents = yield select(getDocuments);
+    yield call(Api.saveDocuments, db, documents);
+}
+export function* watchUpdateDocumentNotTimestampAndSave() {
+    yield takeLatest(UPDATE_DOCUMENT_NOT_TIMESTAMP_AND_SAVE, updateDocumentNotTimestampAndSave);
 }
