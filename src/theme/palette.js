@@ -11,6 +11,14 @@ export const lightPalette = {
         light: '#bcbcbc',
         lighter: '#ebebeb',
     },
+    tags: {
+        red: '#d80000',
+        violet: '#e061e0',
+        cyan: '#92c8da',
+        green: '#68d268',
+        yellow: '#eac614',
+        untagged: '#222222',
+    }
 };
 
 export const darkPalette = {
@@ -26,6 +34,14 @@ export const darkPalette = {
         light: '#666666',
         lighter: '#31363f',
     },
+    tags: {
+        red: '#ff4646',
+        violet: '#ee82ee',
+        cyan: '#6fbdd6',
+        green: '#7de07d',
+        yellow: '#f1f172',
+        untagged: '#bcbcbc',
+    }
 };
 
 export const landingPalette = {

@@ -22,7 +22,7 @@ const Dot = styled.div`
     `}
     
     border-radius: 50%;
-    background-color: ${props => props.color};  
+    background-color: ${props => props.theme.palette.tags[props.tag] };  
 `
 
 const ContentContainer = styled.div`
@@ -69,7 +69,7 @@ const Document = (props) => {
     return (
         <RowItem>
             <DotWrapper>
-                <Dot center={true} color={getTagColor(props.tag)} onClick={e => e.preventDefault()} onMouseDown={handleTagClick}/>
+                <Dot center={true} tag={props.tag} onClick={e => e.preventDefault()} onMouseDown={handleTagClick}/>
                 {isDropDownActive && (
                 <DropDown
                     margin={'6px 0 0 14px'}

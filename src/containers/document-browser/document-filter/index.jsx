@@ -42,8 +42,8 @@ const Dot = styled.div`
     margin-bottom: 8px;
 
     border-radius: 50%;
-    border: 1.5px solid ${props => props.color};
-    background-color: ${props => props.active ? props.color : 'transparent'};
+    border: 1.5px solid ${props => props.theme.palette.tags[props.tag]};
+    background-color: ${props => props.active ? props.theme.palette.tags[props.tag] : 'transparent'};
 
     cursor: pointer;
 `
@@ -64,7 +64,7 @@ const DocumentFilter = () => {
             <InnerContainer>
                 {TAGS.map(tag => (
                     <React.Fragment key={tag.name}>
-                        <Dot data-tip data-for={tag.name} color={tag.color} active={!!tags[tag.name] ? 1 : 0} onClick={() => toggleTag(tag.name)}/>
+                        <Dot data-tip data-for={tag.name} tag={tag.name} active={!!tags[tag.name] ? 1 : 0} onClick={() => toggleTag(tag.name)}/>
                         <ReactTooltip id={tag.name} place="bottom" effect="solid">
                             {tag.displayName}
                         </ReactTooltip>
