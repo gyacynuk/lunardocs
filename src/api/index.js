@@ -2,7 +2,6 @@ import firebase from 'firebase'
 import { fetchUser, signOutUser, upsertUser } from './user'
 import { saveDocument, createNewDocumentValue } from './editor'
 import { fetchAllDocuments, fetchDocumentById, saveDocuments } from './documents'
-import { isInitialDocument, generateInitialDocumentAndDestroyPreset } from './initialDocument'
 
 export const fire = firebase.initializeApp({
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
@@ -25,6 +24,4 @@ export default {
     fetchAllDocuments,
     fetchDocumentById,
     saveDocuments,
-    isInitialDocument,
-    generateInitialDocumentAndDestroyPreset,
 }

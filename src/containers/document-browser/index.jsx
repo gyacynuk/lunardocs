@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -11,10 +11,8 @@ import ContentPane from '../../components/content-pane';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDocumentsAsync } from '../../store/actions';
-import { getDocumentFilterTerm, getDocuments, getFilteredDocuments } from '../../store/selectors';
+import { getFilteredDocuments } from '../../store/selectors';
 import { Link } from 'react-router-dom/cjs/react-router-dom.min';
-import Api from '../../api';
-import {v4 as uuid} from 'uuid'
 
 
 const ScrollableContainer = styled.div`
@@ -23,6 +21,17 @@ const ScrollableContainer = styled.div`
 
     overflow-y: auto;
 `
+
+export const TAGS = [
+    { name: 'red', displayName: 'Red Tag', color: 'red' },
+    { name: 'violet', displayName: 'Violet Tag', color: 'violet' },
+    { name: 'cyan', displayName: 'Cyan Tag', color: 'lightBlue' },
+    { name: 'green', displayName: 'Green Tag', color: 'lightGreen' },
+    { name: 'yellow', displayName: 'Yellow Tag', color: 'yellow' },
+    { name: 'untagged', displayName: 'Untagged', color: 'grey' },
+]
+
+export const getTagColor = tagName => TAGS.find(tag => tag.name === tagName).color;
 
 const DocumentBrowser = () => {
     const dispatch = useDispatch();
@@ -42,7 +51,7 @@ const DocumentBrowser = () => {
                     (<React.Fragment key={doc.id} >
                         <Divider/>
                         <Link to={`/documents/edit/${doc.id}`}>
-                            <Document title={doc.title} date={moment(doc.timestamp).format('MMM Do YYYY, h:mm a')} subjectColor="red"/>
+                            <Document id={doc.id} title={doc.title} tag={doc.tag || 'untagged'} date={moment(doc.timestamp).format('MMM Do YYYY, h:mm a')}/>
                         </Link>
                     </React.Fragment>))}
             </ScrollableContainer>
