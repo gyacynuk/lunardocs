@@ -4,6 +4,8 @@ import anime from 'animejs';
 import styled from 'styled-components';
 
 import { ReactComponent as MoonSVG } from '../../assets/images/moon.svg';
+import previewImg from '../../assets/images/preview.png';
+
 import Spacer from '../../components/spacer';
 import LandingNavBar from './landing-nav-bar';
 import SlidingButton from '../../components/sliding-button';
@@ -110,12 +112,44 @@ const HeroText = styled.div`
     font-weight: ${props => props.thin ? 100 : 700};
 `
 
+const LearnMoreContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+`
+const TextHolder = styled.div`
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+
+    ${({ theme }) => theme.isDesktop`
+        flex: 1;
+    `}
+`
 const Heading = styled.h1`
     color: white;
     font-size: 2rem;
 `
 const Temp = styled.p`
     color: white;
+`
+const ImageHolder = styled.div`
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+
+    ${({ theme }) => theme.isDesktop`
+        flex: 1;
+    `}
+`
+const ExpandingImage = styled.img`
+    width: 100%;
+    height: auto;
+
+    ${({ theme }) => theme.isDesktop`
+        margin-left: 32px;
+    `}
 `
 
 const LandingPage = () => {
@@ -275,13 +309,23 @@ const LandingPage = () => {
             <MainColumn>
                 <Spacer height={'calc(100vh - 80px)'}/>
                 <Spacer id="anchor" height={'80px'}/>
-                <Heading id="anchor2">What is LunarDocs?</Heading>
-                <Temp>
-                    LunarDocs is a web-based text editor developed by Griffin Yacynuk. The project aims to provide users with an integrated note-taking and study environment: specifically users can annotate their notes with flash-card style questions, which they will later quiz themselves with.
-                </Temp>
-                <Temp>   
-                    As this is currently a work in progress, some features may not yet be implemented. However, please feel free to check out the project nonetheless!
-                </Temp>
+                <LearnMoreContainer>
+                    <TextHolder>
+                        <Heading id="anchor2">What is LunarDocs?</Heading>
+                        <Temp>
+                            LunarDocs is a web-based text editor developed by Griffin Yacynuk. The project aims to provide users with an integrated note-taking and study environment: specifically users can annotate their notes with flash-card style questions, which they will later quiz themselves with.
+                        </Temp>
+                        <Temp>   
+                            As this is currently a work in progress, some features may not yet be implemented. However, please feel free to check out the project nonetheless!
+                        </Temp>
+                    </TextHolder>
+
+                    <ImageHolder>
+                        <ExpandingImage src={previewImg}/>
+                    </ImageHolder>
+                </LearnMoreContainer>
+                
+                
             </MainColumn>
             
         </>
