@@ -63,7 +63,7 @@ const Document = (props) => {
     }
 
     const tagComponents = TAGS.map(tag => (
-        {key: tag.name, component: (<Dot color={tag.color}/>) }
+        {key: tag.name, component: (<Dot tag={tag.name}/>) }
     ));
 
     return (

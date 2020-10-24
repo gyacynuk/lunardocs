@@ -14,14 +14,12 @@ function* createNewDocument(action) {
     const id = uuid();
     const value = Api.createNewDocumentValue(documentTitle);
 
-    yield put(setActiveDocumentId(id));
-    yield put(setActiveDocumentValue(value));
+    // Save Document
+    yield call(Api.saveDocument, db, { id: id, title: documentTitle, value: value })
+    yield put(prependDocumentAndSave({ id: id, title: documentTitle }));
 
     yield delaySaga(100); // Seems like the array update in the reducer isnt atomic... need a short delay
     history.push(`documents/edit/${id}`);
-
-    // Save to documents list
-    yield put(prependDocumentAndSave({id: id, title: documentTitle, value: value}));
 }
 export function* watchCreateNewDocument() {
     yield takeLatest(EDITOR_CREATE_DOCUMENT, createNewDocument);
@@ -99,9 +97,9 @@ function* saveDocumentAsync(action) {
         yield put(setActiveDocumentTitle(action.payload.title));
         yield put(updateDocument({id: action.payload.id, title: action.payload.title}))
     }
+    // Don't need to update document list here, since document values are not stored
     if (action.payload.value) {
         yield put(setActiveDocumentValue(action.payload.value));
-        yield put(updateDocument({id: action.payload.id, value: action.payload.value}))
     }
 
     // Debounce by delaying saga
