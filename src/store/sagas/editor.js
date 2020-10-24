@@ -1,9 +1,9 @@
-import { put, call, takeLatest, delay, select } from 'redux-saga/effects'
+import { put, call, takeLatest, delay as delaySaga, select } from 'redux-saga/effects'
 import { EDITOR_SAVE_DELAY_MILLIS } from '../../api/constants'
-import { setActiveDocumentId, setActiveDocumentTitle, setActiveDocumentValue, closeDocument, saveDocumentValueAsync, setLoading, setSavePending } from '../actions'
+import { setActiveDocumentId, setActiveDocumentTitle, setActiveDocumentValue, closeDocument, saveDocumentValueAsync, setLoading, setSavePending, prependDocumentAndSave, updateDocument, updateDocumentAndSave } from '../actions'
 import { EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT, EDITOR_CREATE_DOCUMENT } from '../actionTypes'
 import Api, { db } from '../../api'
-import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue, isActiveDocumentLoaded, isSavePending } from '../selectors'
+import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue, getDocuments, isActiveDocumentLoaded, isSavePending } from '../selectors'
 import { initialState } from '../reducers/editor'
 import { v4 as uuid } from 'uuid';
 
@@ -17,8 +17,11 @@ function* createNewDocument(action) {
     yield put(setActiveDocumentId(id));
     yield put(setActiveDocumentValue(value));
 
-    yield delay(100); // Seems like the array update in the reducer isnt atomic... need a short delay
+    yield delaySaga(100); // Seems like the array update in the reducer isnt atomic... need a short delay
     history.push(`documents/edit/${id}`);
+
+    // Save to documents list
+    yield put(prependDocumentAndSave({id: id, title: documentTitle, value: value}));
 }
 export function* watchCreateNewDocument() {
     yield takeLatest(EDITOR_CREATE_DOCUMENT, createNewDocument);
@@ -30,18 +33,43 @@ function* openDocument(action) {
         return;
     }
 
+    // Start loading screen
     yield put(setLoading(true))
+
+    // Load in data
     const id = action.payload; 
     const { title, value } = yield call(Api.fetchDocumentById, db, id);
-    if (title == undefined || value == undefined) {
+    const isWelcomeDocument = yield call(Api.isInitialDocument, id);
+
+    // Handle special case of the initial/welcome document
+    if (isWelcomeDocument) {
+        const initialDoc = yield call(Api.generateInitialDocumentAndDestroyPreset);
+        yield (put(setActiveDocumentId(initialDoc.id)));
+        yield (put(setActiveDocumentTitle(initialDoc.title)));
+        yield (put(setActiveDocumentValue(initialDoc.value)));
+
+        // Save this doc to the user's DB
+        yield put(saveDocumentValueAsync({
+            id: initialDoc.id,
+            title: initialDoc.title,
+            value: initialDoc.value,
+            delay: 0
+        }))
+    }
+    // Handle case when document does not exist
+    else if (title == undefined || value == undefined) {
         yield (put(setActiveDocumentId(id)));
         yield (put(setActiveDocumentTitle(initialState.activeDocument.title)));
         yield (put(setActiveDocumentValue(initialState.activeDocument.value)));
-    } else {
+    }
+    // Handle case when doc is loaded normally
+    else {
         yield (put(setActiveDocumentId(id)));
         yield (put(setActiveDocumentTitle(title)));
         yield (put(setActiveDocumentValue(value)));
     }
+
+    // End loading screen
     yield put(setLoading(false))
 }
 export function* watchOpenDocument() {
@@ -69,7 +97,7 @@ function* saveActiveDocumentAndClose(action) {
     }
 
     // Reset current state
-    yield delay(50)
+    yield delaySaga(50)
     yield put(closeDocument())
 }
 export function* watchSaveActiveDocumentAndClose() {
@@ -85,18 +113,21 @@ function* saveDocumentAsync(action) {
     yield put(setActiveDocumentId(action.payload.id));
     if (action.payload.title) {
         yield put(setActiveDocumentTitle(action.payload.title));
+        yield put(updateDocument({id: action.payload.id, title: action.payload.title}))
     }
     if (action.payload.value) {
         yield put(setActiveDocumentValue(action.payload.value));
+        yield put(updateDocument({id: action.payload.id, value: action.payload.value}))
     }
 
     // Debounce by delaying saga
     const delayDuration = action.payload.delay == undefined ? EDITOR_SAVE_DELAY_MILLIS : action.payload.delay;
-    console.log('delay: ' + delayDuration)
-    yield delay(delayDuration);
+    yield delaySaga(delayDuration);
     
     // Update document in database
-    yield call(Api.saveDocument, db, action.payload)
+    const { delay, ...documentData } = action.payload
+    yield call(Api.saveDocument, db, documentData)
+    yield call(Api.saveDocuments, db, yield select(getDocuments))
 
     // Save is complete 
     yield put(setSavePending(false));

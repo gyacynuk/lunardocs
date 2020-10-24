@@ -8,13 +8,13 @@ import DocumentFilter from './document-filter';
 import SearchBar from './search-bar';
 import NewDocumentButton from './new-document-button';
 import ContentPane from '../../components/content-pane';
-import Api, { db } from '../../api';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDocumentsAsync } from '../../store/actions';
-import { getActiveDocumentValue, getDocuments } from '../../store/selectors';
+import { getDocumentFilterTerm, getDocuments, getFilteredDocuments } from '../../store/selectors';
 import { Link } from 'react-router-dom/cjs/react-router-dom.min';
-
+import Api from '../../api';
+import {v4 as uuid} from 'uuid'
 
 
 const ScrollableContainer = styled.div`
@@ -26,10 +26,9 @@ const ScrollableContainer = styled.div`
 
 const DocumentBrowser = () => {
     const dispatch = useDispatch();
-    const documents = useSelector(getDocuments);
+    const documents = useSelector(getFilteredDocuments);
 
     useEffect(() => {
-        console.log("fetching docs")
         dispatch(fetchDocumentsAsync())
     }, [])
 

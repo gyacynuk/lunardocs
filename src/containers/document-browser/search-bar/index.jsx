@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { ReactComponent as MagnifySVG } from '../../../assets/icons/magnifying-glass.svg'
+import { useDispatch, useSelector } from 'react-redux';
+import { getDocumentFilterTerm } from '../../../store/selectors';
+import { setDocumentFilterTerm } from '../../../store/actions';
 
 const Container = styled.div`
     position: relative;
@@ -46,9 +49,12 @@ const MagnifyIcon = styled(MagnifySVG)`
 `
 
 const SearchBar = () => {
+    const dispatch = useDispatch();
+    const filterTerm = useSelector(getDocumentFilterTerm);
+
     return (
         <Container>
-            <SearchInput type="text"/>
+            <SearchInput type="text" value={filterTerm} onChange={e => dispatch(setDocumentFilterTerm(e.target.value))}/>
             <MagnifyIcon/>
         </Container>
     );

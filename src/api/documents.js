@@ -1,9 +1,9 @@
 import { fire } from '../api'
-import { USER_COLLECTION } from './user'
+import { fetchUser, upsertUser, USER_COLLECTION } from './user'
 import { USER_DOCUMENT_COLLECTION } from './editor'
+import { generateInitialDocumentNoValue } from './initialDocument'
 
 export const fetchDocumentById = async (db, documentId) => {
-    console.log('fetchDocumentById')
     try {
         const currentUserUuid = fire.auth().currentUser.uid
         return await db
@@ -16,7 +16,6 @@ export const fetchDocumentById = async (db, documentId) => {
                 if (doc.exists) {
                     return doc.data();
                 } else {
-                    // TODO handle error when doc id does not exist
                     return {}
                 }
             });
@@ -30,19 +29,15 @@ export const fetchDocumentById = async (db, documentId) => {
 }
 
 export const fetchAllDocuments = async (db) => {
-    try {
-        const currentUserUuid = fire.auth().currentUser.uid
-        return await db
-            .collection(USER_COLLECTION)
-            .doc(currentUserUuid)
-            .collection(USER_DOCUMENT_COLLECTION)
-            .orderBy("timestamp", "desc")
-            .get()
-            .then(querySnapshot => querySnapshot.docs.map(doc => doc.data()));
-    } catch (error) {
-        console.error('error fetching documents')
-        console.log(error)
+    const currentUserUuid = fire.auth().currentUser.uid;
+    const user = await fetchUser(db, currentUserUuid)
+    if (user && user.documents) {
+        return user.documents
     }
 
-    return [];
+    return [ generateInitialDocumentNoValue() ];
+}
+
+export const saveDocuments = async (db, documents) => {
+    upsertUser(db, { documents });
 }

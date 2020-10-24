@@ -15,7 +15,7 @@ import Portal from '../../components/portal'
 import { CodeElement, DefaultElement, Leaf, ImageElement, Header1Element, Header2Element, Header3Element, TitleElement } from "./elements";
 import { useSelector, useDispatch } from "react-redux";
 import { getActiveDocumentValue, getShortcutTarget, getShortcutSearch, getShortcutDropdownIndex } from "../../store/selectors";
-import { setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex, saveDocumentValueAsync, openDocument } from "../../store/actions";
+import { setShortcutTarget, setShortcutSearch, setShortcutDropdownIndex, saveDocumentValueAsync, openDocument, fetchDocumentsAsync } from "../../store/actions";
 
 import ToolBar from "./tool-bar";
 import ToolBarButton from "./tool-bar-button";
@@ -154,9 +154,11 @@ const toggleBlock = (editor, format) => {
 const TextEditor = ({ documentId, ...props }) => {
     const dispatch = useDispatch();
 
-    // Load in current document
+    // Load in current document. This is needed when the editor page is accessed directly, such as by entering the URL.
     useEffect(() => {
         dispatch(openDocument(documentId))
+        // Ensures that the document list exists, prevents accidental deletion of other docs on save
+        dispatch(fetchDocumentsAsync())
     }, [documentId])
 
     // Create a Slate editor object that won't change across renders.
@@ -294,7 +296,6 @@ const TextEditor = ({ documentId, ...props }) => {
 
     const onChange = value => {
         // If the document state has changes, then queue up an async debounced save
-        console.log(value)
         if (documentValue != value) {
             const titleString = Editor.string(editor, [0]);
             dispatch(saveDocumentValueAsync({

@@ -32,8 +32,6 @@ export const createNewDocumentValue = title => {
  * @param {any} documentData 
  */
 export const saveDocument = async (db, documentData) => {
-    console.log('saveDocument')
-
     // Add timestamp to document data
     documentData = { ...documentData, timestamp: + new Date() }
 

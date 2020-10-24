@@ -11,6 +11,16 @@ export const getTheme = store => store.display.theme;
 
 // Documents
 export const getDocuments = store => store.documents.documents;
+export const areDocumentsLoaded = store => store.documents.areDocumentsLoaded;
+export const getDocumentFilterTerm = store => store.documents.filterTerm;
+export const getDocumentFilterTags = store => store.documents.tags;
+export const getFilteredDocuments = store => {
+    const filterTerm = getDocumentFilterTerm(store)
+    if (filterTerm === '') {
+        return store.documents.documents;
+    }
+    return store.documents.documents.filter(doc => doc.title.toLowerCase().startsWith(filterTerm));
+}
 
 // Editor
 export const getActiveDocumentId = store => store.editor.activeDocument.id;

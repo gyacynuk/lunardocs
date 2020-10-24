@@ -59,10 +59,6 @@ const Button = styled.div`
     background-color: ${props => props.filled ? 'white' : `transparent`};
 
     font-weight: 400;
-
-    ${({ theme }) => theme.isMobile`
-        display:none
-    `}
 `
 
 
