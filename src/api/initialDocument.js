@@ -12,7 +12,7 @@ const initialDocumentValue = [
         type: "paragraph"
     },
     {
-        children: [{text: "In the toolbar at the top of the page, on the right hand side, you will find a save icon 🔄. Whenever this is spinning it indicates that your changes are being automatically saved for you! Next to this icon you'll see a crescent moon 🌙, and clicking this will toggle your theme between ligth and dark. "}],
+        children: [{text: "In the toolbar at the top of the page, on the right hand side, you will find a save icon 🔄. Whenever this is spinning it indicates that your changes are being automatically saved for you. Next to this icon you'll see a crescent moon 🌙, and clicking this will toggle your theme between light and dark. "}],
         type: "paragraph"
     },
     {
@@ -48,16 +48,16 @@ const initialDocumentValue = [
         type: "paragraph"
     },
     {
-        children: [{text: "You'll also find buttons to create "},{text: "bold",bold: true},{text: ", "},{italic: true,text: "italic"},{text: ", and "},{underline: true,text: "underlined"},{text: " text in the toolbar. These can be activated by pressing ⌘+B, ⌘+I, and ⌘+U respectively. (For Windows or Linux users, press ctrl instead of cmd). Furthermore you have the ability to define "},{text: "inline code segments",code: true},{text: " with the "},{text: "<>",code: true},{text: " button!"}],
+        children: [{text: "You'll also find buttons to create "},{text: "bold",bold: true},{text: ", "},{italic: true,text: "italic"},{text: ", and "},{underline: true,text: "underlined"},{text: " text in the toolbar. These can be activated by pressing ⌘+B, ⌘+I, and ⌘+U respectively. (For Windows or Linux users, press ctrl instead of cmd). Furthermore you have the ability to define "},{text: "inline code segments",code: true},{text: " with the "},{text: "<>",code: true},{text: " button."}],
         type: "paragraph"
     },
     {
-        children: [{type: "list-item",children: [{text: "Lists can be created with the last two buttons in the toolbar."}]},{children: [{text: "Just like with code blocks, holding Shift + Enter will add a new line to your list!"}],type: "list-item"}],
+        children: [{type: "list-item",children: [{text: "Lists can be created with the last two buttons in the toolbar."}]},{children: [{text: "Just like with code blocks, holding Shift + Enter will add a new line to your list."}],type: "list-item"}],
         type: "bulleted-list"
     },
     {
         type: "paragraph",
-        children: [{text: "Finally, LunarDocs provides keyboard shortcuts for our power users ⚡️. To use a shortcut, type slash (/) and a dropdown menu will appear. Continue typing to refine your search, or use the arrow keys to select an option, and press Enter to apply it!"}]
+        children: [{text: "Finally, LunarDocs provides keyboard shortcuts for our power users ⚡️. To use a shortcut, type slash (/) and a dropdown menu will appear. Continue typing to refine your search, or use the arrow keys to select an option, and press Enter to apply it."}]
     }
 ]
 
