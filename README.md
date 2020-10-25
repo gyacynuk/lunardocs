@@ -5,6 +5,12 @@ LunarDocs is a web-based text editor developed by Griffin Yacynuk. The project a
 
 Check out the live site here: https://lunardocs.com/
 
-# Screen Shots
+## Technologies Used
+- React V16+
+- Redux
+- Redux Saga
+- Firebase
+
+## Screen Shots
 <img src="https://github.com/gyacynuk/lunardocs-frontend/blob/master/demo/demo-browser.png?raw=true"/>
 <img src="https://github.com/gyacynuk/lunardocs-frontend/blob/master/demo/demo-document.png?raw=true"/>
