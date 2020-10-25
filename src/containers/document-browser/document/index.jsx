@@ -67,7 +67,7 @@ const Document = (props) => {
     ));
 
     return (
-        <RowItem>
+        <RowItem onClick={() => props.onClick()}>
             <DotWrapper>
                 <Dot center={true} tag={props.tag} onClick={e => e.preventDefault()} onMouseDown={handleTagClick}/>
                 {isDropDownActive && (
@@ -94,6 +94,7 @@ Document.propTypes = {
     tagName: PropTypes.string,
     date: PropTypes.string,
     subjectColor: PropTypes.string,
+    onClick: PropTypes.func,
 };
 
 export default Document;

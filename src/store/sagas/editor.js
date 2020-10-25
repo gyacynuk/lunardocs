@@ -1,7 +1,7 @@
 import { put, call, takeLatest, delay as delaySaga, select } from 'redux-saga/effects'
 import { EDITOR_SAVE_DELAY_MILLIS } from '../../api/constants'
 import { setActiveDocumentId, setActiveDocumentTitle, setActiveDocumentValue, closeDocument, saveDocumentValueAsync, setLoading, setSavePending, prependDocumentAndSave, updateDocument, updateDocumentAndSave } from '../actions'
-import { EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT, EDITOR_CREATE_DOCUMENT } from '../actionTypes'
+import { EDITOR_SAVE_DOCUMENT_ASYNC, EDITOR_OPEN_DOCUMENT, EDITOR_SAVE_AND_CLOSE_DOCUMENT, EDITOR_CREATE_DOCUMENT, EDITOR_LOAD_DOCUMENT_AND_OPEN_EDITOR } from '../actionTypes'
 import Api, { db } from '../../api'
 import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue, getDocuments, isActiveDocumentLoaded, isSavePending } from '../selectors'
 import { initialState } from '../reducers/editor'
@@ -25,14 +25,42 @@ export function* watchCreateNewDocument() {
     yield takeLatest(EDITOR_CREATE_DOCUMENT, createNewDocument);
 }
 
+function* loadDocumentAndOpenEditor(action) {
+    // Start loading screen
+    yield put(setLoading(true))
+
+    const { history, id } = action.payload
+    const { title, value } = yield call(Api.fetchDocumentById, db, id);
+
+    // Handle case when document does not exist
+    if (title == undefined || value == undefined) {
+        yield (put(setActiveDocumentId(id)));
+        yield (put(setActiveDocumentTitle(initialState.activeDocument.title)));
+        yield (put(setActiveDocumentValue(initialState.activeDocument.value)));
+    }
+    // Handle case when doc is loaded normally
+    else {
+        yield (put(setActiveDocumentId(id)));
+        yield (put(setActiveDocumentTitle(title)));
+        yield (put(setActiveDocumentValue(value)));
+    }
+
+    // Give time for editor reducer to finish
+    yield delaySaga(100);
+
+    // End loading screen and redirect
+    yield put(setLoading(false))
+    history.push(`/documents/edit/${id}`);
+}
+export function* watchLoadDocumentAndOpenEditor(action) {
+    yield takeLatest(EDITOR_LOAD_DOCUMENT_AND_OPEN_EDITOR, loadDocumentAndOpenEditor);
+}
+
 function* openDocument(action) {
     const isDocumentAlreadyLoaded = yield select(isActiveDocumentLoaded);
     if (isDocumentAlreadyLoaded) {
         return;
     }
-
-    // Start loading screen
-    yield put(setLoading(true))
 
     // Load in data
     const id = action.payload; 
@@ -50,9 +78,6 @@ function* openDocument(action) {
         yield (put(setActiveDocumentTitle(title)));
         yield (put(setActiveDocumentValue(value)));
     }
-
-    // End loading screen
-    yield put(setLoading(false))
 }
 export function* watchOpenDocument() {
     // Will cancel current running updateDocument task

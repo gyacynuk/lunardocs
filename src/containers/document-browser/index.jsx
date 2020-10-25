@@ -10,9 +10,10 @@ import NewDocumentButton from './new-document-button';
 import ContentPane from '../../components/content-pane';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchDocumentsAsync } from '../../store/actions';
+import { fetchDocumentsAsync, loadDocumentAndOpenEditor } from '../../store/actions';
 import { getFilteredDocuments } from '../../store/selectors';
 import { Link } from 'react-router-dom/cjs/react-router-dom.min';
+import { withRouter } from 'react-router-dom';
 
 
 const ScrollableContainer = styled.div`
@@ -33,13 +34,17 @@ export const TAGS = [
 
 export const getTagColor = tagName => TAGS.find(tag => tag.name === tagName).color;
 
-const DocumentBrowser = () => {
+const DocumentBrowser = ({ history }) => {
     const dispatch = useDispatch();
     const documents = useSelector(getFilteredDocuments);
 
     useEffect(() => {
         dispatch(fetchDocumentsAsync())
     }, [])
+
+    const handleClick = id => {
+        dispatch(loadDocumentAndOpenEditor(id, history));
+    }
 
     return (
         <ContentPane>
@@ -48,11 +53,14 @@ const DocumentBrowser = () => {
             <ScrollableContainer>
                 <NewDocumentButton/>
                 {documents.map(doc =>
-                    (<React.Fragment key={doc.id} >
+                    (<React.Fragment key={doc.id}>
                         <Divider/>
-                        <Link to={`/documents/edit/${doc.id}`}>
-                            <Document id={doc.id} title={doc.title} tag={doc.tag || 'untagged'} date={moment(doc.timestamp).format('MMM Do YYYY, h:mm a')}/>
-                        </Link>
+                        <Document 
+                        id={doc.id}
+                        title={doc.title}
+                        tag={doc.tag || 'untagged'}
+                        date={moment(doc.timestamp).format('MMM Do YYYY, h:mm a')}
+                        onClick={() => handleClick(doc.id)}/>
                     </React.Fragment>))}
             </ScrollableContainer>
         </ContentPane>
@@ -61,4 +69,4 @@ const DocumentBrowser = () => {
 
 DocumentBrowser.propTypes = {};
 
-export default DocumentBrowser;
+export default withRouter(DocumentBrowser);
