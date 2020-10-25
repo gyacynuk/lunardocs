@@ -9,17 +9,29 @@ import { v4 as uuid } from 'uuid';
 
 
 function* createNewDocument(action) {
-    const { history, documentTitle } = action.payload; 
+    // Start loading screen
+    yield put(setLoading(true))
 
+    const { history, documentTitle } = action.payload; 
     const id = uuid();
-    const value = Api.createNewDocumentValue(documentTitle);
+    const title = !documentTitle ? 'Untitled Document' : documentTitle
+    const value = Api.createNewDocumentValue(title);
 
     // Save Document
-    yield call(Api.saveDocument, db, { id: id, title: documentTitle, value: value })
-    yield put(prependDocumentAndSave({ id: id, title: documentTitle }));
+    yield call(Api.saveDocument, db, { id: id, title: title, value: value })
+    yield put(prependDocumentAndSave({ id: id, title: title }));
 
-    yield delaySaga(100); // Seems like the array update in the reducer isnt atomic... need a short delay
-    history.push(`documents/edit/${id}`);
+    // Set Document as active document
+    yield (put(setActiveDocumentId(id)));
+    yield (put(setActiveDocumentTitle(title)));
+    yield (put(setActiveDocumentValue(value)));
+
+    // Give time for editor reducer to finish
+    yield delaySaga(200);
+
+    // End loading screen and redirect
+    yield put(setLoading(false))
+    history.push(`/documents/edit/${id}`);
 }
 export function* watchCreateNewDocument() {
     yield takeLatest(EDITOR_CREATE_DOCUMENT, createNewDocument);
@@ -46,7 +58,7 @@ function* loadDocumentAndOpenEditor(action) {
     }
 
     // Give time for editor reducer to finish
-    yield delaySaga(100);
+    yield delaySaga(200);
 
     // End loading screen and redirect
     yield put(setLoading(false))
