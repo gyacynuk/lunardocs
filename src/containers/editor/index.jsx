@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import isHotkey from 'is-hotkey'
 
-import { createEditor, Editor, Transforms, Range } from 'slate'
+import { createEditor, Editor, Transforms, Range, Path } from 'slate'
 import { Slate, Editable, withReact, ReactEditor, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
 
@@ -78,14 +78,15 @@ const getMatchingShortcuts = searchText => {
 }
 
 const insertShortcut = (editor, shortcut) => {
+    // Delete current selection (shortcut typed by user)
+    Transforms.delete(editor)
+
+    // Apply shortcut
     if (isElementBlock(shortcut)) {
         toggleBlock(editor, shortcut);
     } else {
         toggleMark(editor, shortcut);
     }
-
-    // Delete current selection (shortcut typed by user)
-    Transforms.delete(editor)
 }
 
 const isMarkActive = (editor, format) => {
@@ -308,9 +309,30 @@ const TextEditor = ({ documentId, ...props }) => {
         const { selection } = editor
 
         if (selection && Range.isCollapsed(selection)) {
+            const [start] = Range.edges(selection)
+
+            // If the user has just typed a slash (start of line, or after a space) then show them a dropdown of
+            // all the availible options
+            const { focus } = selection
+            const charBeforeFocus = Editor.before(editor, focus, { unit: 'character' })
+            const wordBeforeFocus = Editor.before(editor, focus, { unit: 'word' }) 
+            // Create range to select just the slash, so it can be deleted
+            const slashBefore = charBeforeFocus && Editor.before(editor, charBeforeFocus)
+            const slashBeforeRange = slashBefore && Editor.range(editor, charBeforeFocus, focus)
+            // Ensure the slash typed by user is at the start of a line, or prepended by a space
+            const slashBeforeWord = wordBeforeFocus && Editor.before(editor, wordBeforeFocus)
+            const slashBeforeWordRange = slashBeforeWord && Editor.range(editor, wordBeforeFocus, focus)
+            const slashBeforeWordText = slashBeforeWordRange && Editor.string(editor, slashBeforeWordRange) 
+            const justSlash = slashBeforeWordText && slashBeforeWordText.match(/^(.+\s)?\/$/)
+            if (justSlash) {
+                dispatch(setShortcutTarget(slashBeforeRange))
+                dispatch(setShortcutSearch(''))
+                dispatch(setShortcutDropdownIndex(0))
+                return
+            }
+
             // If the user has started typing something after the slash, then filter down the list to only things that
             // match
-            const [start] = Range.edges(selection)
             const wordBefore = Editor.before(editor, start, { unit: 'word' })
             const before = wordBefore && Editor.before(editor, wordBefore)
             const beforeRange = before && Editor.range(editor, before, start)
@@ -323,22 +345,6 @@ const TextEditor = ({ documentId, ...props }) => {
             if (beforeMatch && afterMatch && getMatchingShortcuts(beforeMatch[1].toLowerCase()).length != 0) {
                 dispatch(setShortcutTarget(beforeRange))
                 dispatch(setShortcutSearch(beforeMatch[1]))
-                dispatch(setShortcutDropdownIndex(0))
-                return
-            }
-
-            // If the user has just typed a slash (start of line, or after a space) then show them a dropdown of
-            // all the availible options
-            const charBefore = Editor.before(editor, start, { unit: 'character' }) 
-            const slashBefore = charBefore && Editor.before(editor, charBefore)
-            const slashBeforeRange = slashBefore && Editor.range(editor, slashBefore, start)
-            const slashBeforeText = slashBeforeRange && Editor.string(editor, slashBeforeRange) 
-            const justSlash = slashBeforeText && slashBeforeText.match(/^.*\s\/$/)
-            const justSlashMatch = !!justSlash && !!justSlash[0]
-
-            if (justSlashMatch) {
-                dispatch(setShortcutTarget(slashBeforeRange))
-                dispatch(setShortcutSearch(''))
                 dispatch(setShortcutDropdownIndex(0))
                 return
             }
