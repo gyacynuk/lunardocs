@@ -9,6 +9,7 @@ Check out the live site here: https://lunardocs.com/
 - React V16+
 - Redux
 - Redux Saga
+- SlateJS
 - Firebase
 
 ## Screen Shots
