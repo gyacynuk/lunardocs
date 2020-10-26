@@ -28,6 +28,8 @@ const StarWrapper = styled.div`
     width: 100%;
     height: 100%;
 
+    z-index: 2;
+
     background: rgb(0,0,0);
     background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, #1e293b 100%);
 `
@@ -80,14 +82,15 @@ const MainColumn = styled.div`
     left: 0;
     width: 100%; 
 
+    background-color: #1e293b;
+    z-index: 1;
+
     padding: 64px;
     ${({ theme }) => theme.isMobile`
         padding: 24px;
     `}
 
     display: block;
-    
-    transform: translateZ(0);
 `
 
 const HeroContainer = styled.div`
@@ -97,6 +100,7 @@ const HeroContainer = styled.div`
     left: 50%;
     transform: translate(-50%, 0);
 
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
