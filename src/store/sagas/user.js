@@ -2,6 +2,8 @@ import { call, put, delay, takeEvery, takeLatest } from 'redux-saga/effects'
 import Api, { db } from '../../api'
 import { FETCH_USER_ASYNC, SIGN_OUT_USER, SET_USER_PREFERRED_THEME } from '../actionTypes'
 import { setLoading, setTheme, setUser } from '../actions'
+import { fire } from '../../api'
+
 
 export function* fetchUserAsync(action) {
     yield put(setLoading(true))
@@ -24,6 +26,9 @@ export function* setUserPreferredTheme(action) {
     yield put(setTheme(action.payload.theme))
     yield delay(2000)
     yield call(Api.upsertUser, db, { preferredTheme: action.payload.theme }) 
+
+    // Log event 
+    yield call(fire.analytics().logEvent, 'user_set_preferred_theme');
 }
 export function* watchSetUserPreferredTheme() {
     yield takeLatest(SET_USER_PREFERRED_THEME, setUserPreferredTheme)
