@@ -6,6 +6,7 @@ import Api, { db } from '../../api'
 import { getActiveDocumentId, getActiveDocumentTitle, getActiveDocumentValue, getDocuments, isActiveDocumentLoaded, isSavePending } from '../selectors'
 import { initialState } from '../reducers/editor'
 import { v4 as uuid } from 'uuid';
+import { fire } from '../../api';
 
 
 function* createNewDocument(action) {
@@ -32,6 +33,9 @@ function* createNewDocument(action) {
     // End loading screen and redirect
     yield put(setLoading(false))
     history.push(`/documents/edit/${id}`);
+
+    // Log event 
+    yield call(fire.analytics().logEvent, 'create_new_document');
 }
 export function* watchCreateNewDocument() {
     yield takeLatest(EDITOR_CREATE_DOCUMENT, createNewDocument);
@@ -63,6 +67,9 @@ function* loadDocumentAndOpenEditor(action) {
     // End loading screen and redirect
     yield put(setLoading(false))
     history.push(`/documents/edit/${id}`);
+
+    // Log event 
+    yield call(fire.analytics().logEvent, 'open_document_from_browser');
 }
 export function* watchLoadDocumentAndOpenEditor(action) {
     yield takeLatest(EDITOR_LOAD_DOCUMENT_AND_OPEN_EDITOR, loadDocumentAndOpenEditor);
@@ -83,6 +90,9 @@ function* openDocument(action) {
         yield (put(setActiveDocumentId(id)));
         yield (put(setActiveDocumentTitle(initialState.activeDocument.title)));
         yield (put(setActiveDocumentValue(initialState.activeDocument.value)));
+
+        // Log event 
+        yield call(fire.analytics().logEvent, 'open_non_existant_document_from_url');
     }
     // Handle case when doc is loaded normally
     else {
@@ -90,6 +100,9 @@ function* openDocument(action) {
         yield (put(setActiveDocumentTitle(title)));
         yield (put(setActiveDocumentValue(value)));
     }
+
+    // Log event 
+    yield call(fire.analytics().logEvent, 'open_document_from_url');
 }
 export function* watchOpenDocument() {
     // Will cancel current running updateDocument task

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styled, { withTheme } from 'styled-components';
 import { Link } from 'react-router-dom';
 import SlidingButton from '../../../components/sliding-button';
+import { fire } from '../../../api';
+
 
 const Container = styled.div`
     position: fixed;
@@ -74,13 +76,18 @@ const LandingNavBar = (props) => {
                     padding={'8px 0'}
                     color={'white'}
                     hoverColor={'black'}
-                    fontWeight={'400'}>
+                    fontWeight={'400'}
+                    onClick={() => fire.analytics().logEvent('landing_page_login_click')}>
                         Login
                     </DesktopOnlySlidingButton>
                 </Link>
                 
                 <Link to='/login'>
-                    <Button filled>Sign Up</Button>
+                    <Button
+                    filled
+                    onClick={() => fire.analytics().logEvent('landing_page_signup_click')}>
+                        Sign Up
+                    </Button>
                 </Link>
             </Group>
         </Container>

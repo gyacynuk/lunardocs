@@ -305,7 +305,10 @@ const LandingPage = () => {
                 margin={'32px 0'}
                 color={'white'}
                 hoverColor={'black'}
-                onClick={() => document.getElementById('anchor').scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+                onClick={() => {
+                    document.getElementById('anchor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    fire.analytics().logEvent('landing_page_learn_more_click');
+                }}>
                     Learn More
                 </SlidingButton>
             </HeroContainer>
