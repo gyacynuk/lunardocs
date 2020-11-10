@@ -62,6 +62,11 @@ const Document = (props) => {
         dispatch(setActiveDropDownTag(null));
     }
 
+    const cancelClick = e => {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
     const tagComponents = TAGS.map(tag => (
         {key: tag.name, component: (<Dot tag={tag.name}/>) }
     ));
@@ -69,7 +74,7 @@ const Document = (props) => {
     return (
         <RowItem onClick={() => props.onClick()}>
             <DotWrapper>
-                <Dot center={true} tag={props.tag} onClick={e => e.preventDefault()} onMouseDown={handleTagClick}/>
+                <Dot center={true} tag={props.tag} onClick={cancelClick} onMouseDown={handleTagClick}/>
                 {isDropDownActive && (
                 <DropDown
                     margin={'6px 0 0 14px'}
